@@ -11,4 +11,9 @@
       <ProjectReference Include="..\MoodleApiWrapper\MoodleApiWrapper.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <PackageReference Include="CommandLineParser" Version="2.8.0" />
+      <PackageReference Include="Lorem.Universal.NET" Version="4.0.80" />
+    </ItemGroup>
+
 </Project>

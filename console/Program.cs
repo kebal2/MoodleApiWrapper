@@ -1,11 +1,24 @@
 ﻿// See https://aka.ms/new-console-template for more information
 
+using CommandLine;
+
 using MoodleApiWrapper;
 
 using Newtonsoft.Json;
 
-var host = new Uri("http://localhost:8000/");
-var apiToken = "80b8c01e3f20f01bde6d185669540c26";
+Uri host = default;
+string apiToken = default;
+int courseCount = 1;
+
+Parser.Default.ParseArguments<Options>(args)
+    .WithParsed(o =>
+    {
+        host = new Uri(o.Host);
+        apiToken = o.Token;
+
+        if (o.CourseCount.HasValue)
+            courseCount = o.CourseCount.Value;
+    });
 
 var moodleApiWrapper = new ApiWrapper(host, apiToken);
 
