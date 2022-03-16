@@ -22,9 +22,16 @@ Parser.Default.ParseArguments<Options>(args)
 
 var moodleApiWrapper = new ApiWrapper(host, apiToken);
 
-var courses = new[]{new CourseModel("Alma", "Alma", 0)};
+var courses = new List<CourseModel>(
+    Enumerable.Range(0, courseCount).Select(i =>
+    {
+        var courseFullName = LoremNET.Lorem.Words(10);
+        var courseShortName = courseFullName.Replace(" ", String.Empty);
 
-var result = await moodleApiWrapper.CreateCourses(courses);
+        return new CourseModel(courseFullName, courseShortName, 1);
+    }));
+
+var result = await moodleApiWrapper.CreateCourses(courses.ToArray());
 
 var res = JsonConvert.SerializeObject(result);
 
