@@ -1,68 +1,45 @@
-﻿using MoodleApiWrapper;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
+﻿using Newtonsoft.Json.Linq;
+
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Net.Http;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace MoodleApiWrapper
 {
-    public class ApiWrapper
+    public class ApiWrapper : IDisposable
     {
+        private readonly HttpClient client;
+        private readonly Uri host;
+        private readonly string apiToken = "";
 
-
-        #region Properties
-
-        /// <summary>
-        /// field that holds your api token
-        /// </summary>
-        private static string _apiToken = "";
-
-        /// <summary>
-        /// This property sets you Api token.
-        /// </summary>
-        public static string ApiToken
+        public ApiWrapper(Uri host)
         {
-            get { return _apiToken; }
-            set { _apiToken = value; }
+            client = new HttpClient();
+
+            client.BaseAddress = host;
         }
 
-        /// <summary>
-        /// Repressents if the token is set.
-        /// </summary>
-        private static bool TokenIsSet => ApiToken.Any();
-
-        private static Uri _host;
-
-        public static Uri Host
+        public ApiWrapper(Uri host, string apiToken) : this(host)
         {
-            get { return _host; }
-            set { _host = value; }
+            this.host = host;
+            this.apiToken = apiToken;
         }
 
-        /// <summary>
-        /// Represents if the host address is set.
-        /// </summary>
-        private static bool HostIsSet => Host.AbsoluteUri.Any();
+        private bool TokenIsSet => apiToken.Any();
+        private bool HostIsSet => host.AbsoluteUri.Any();
 
-        #endregion
-
-   
-        #region functions
-
-        #region Helper functions
-
-        private static int DateTimeToUnixTimestamp(DateTime dateTime)
+        private int DateTimeToUnixTimestamp(DateTime dateTime)
         {
             return Convert.ToInt32((TimeZoneInfo.ConvertTimeToUtc(dateTime) -
-                   new DateTime(1970, 1, 1, 0, 0, 0, 0, System.DateTimeKind.Utc)).TotalSeconds);
+                                    new DateTime(1970, 1, 1, 0, 0, 0, 0, System.DateTimeKind.Utc)).TotalSeconds);
         }
 
-        private static string ParseFormat(Format format)
+        private string ParseFormat(Format format)
         {
             switch (format)
             {
@@ -71,11 +48,11 @@ namespace MoodleApiWrapper
                 case Format.XML:
                     return "xml";
             }
+
             throw new ArgumentOutOfRangeException("format");
         }
 
-
-        private static string ParseMethod(Methods method)
+        private string ParseMethod(Methods method)
         {
             switch (method)
             {
@@ -134,12 +111,10 @@ namespace MoodleApiWrapper
                 case Methods.default_:
                     return "";
             }
+
             throw new ArgumentOutOfRangeException("method");
         }
 
-        #endregion
-
-        #region Authentications
         /// <summary>
         /// Returns your Api Token needed to make any calls
         /// <para />
@@ -148,37 +123,33 @@ namespace MoodleApiWrapper
         /// If you want to use the Mobile service, its shortname is moodle_mobile_app. Also useful to know,
         /// the database shortname field can be found in the table named external_services.
         /// </summary>
-        /// <param names="username"></param>
-        /// <param names="password"></param>
-        /// <param names="serviceHostName"></param>
+        /// <param name="client"></param>
+        /// <param name="username"></param>
+        /// <param name="password"></param>
+        /// <param name="serviceHostName"></param>
+        /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        public static Task<AuthentiactionResponse<AuthToken>> GetApiToken(string username, string password,
-            string serviceHostName)
+        public Task<AuthentiactionResponse<AuthToken>> GetapiToken(string username, string password, string serviceHostName, CancellationToken cancellationToken = default)
         {
-            if (HostIsSet)
-            {
-                string query =
-                    "login/token.php" +
-                    $"?username={username}" +
-                    $"&password={password}" +
-                    $"&service={serviceHostName}";
+            if (!HostIsSet) throw new Exception("Host is not set");
 
-                return GetAuth<AuthToken>(Host.AbsoluteUri + query);
-            }
-            else
-            {
-                throw new Exception("Host is not set");
-            }
+            string query =
+                "login/token.php" +
+                $"?username={username}" +
+                $"&password={password}" +
+                $"&service={serviceHostName}";
+
+            return GetAuth<AuthToken>(host.AbsoluteUri + query, cancellationToken);
         }
-#endregion
 
-        #region System actions
         /// <summary>
         /// This API will return information about the site, web services users, and authorized API actions. This call is useful for getting site information and the capabilities of the web service user. 
         /// </summary>
+        /// <param name="cancellationToken"></param>
+        /// <param name="serviceHostName"></param>
         /// <param names="serviceHostNames">Returns information about a particular service.</param>
         /// <returns></returns>
-        public static Task<ApiResponse<Site_info>> GetSiteInfo(string serviceHostName = "")
+        public Task<ApiResponse<Site_info>> GetSiteInfo(string serviceHostName = "", CancellationToken cancellationToken = default)
         {
             if (HostIsSet && TokenIsSet)
             {
@@ -187,17 +158,17 @@ namespace MoodleApiWrapper
                 {
                     query = string.Format("webservice/rest/server.php" +
                                           "?wstoken={0}&moodlewsrestformat={1}&wsfunction={2}",
-                        ApiToken, ParseFormat(Format.JSON), ParseMethod(Methods.core_webservice_get_site_info));
+                        apiToken, ParseFormat(Format.JSON), ParseMethod(Methods.core_webservice_get_site_info));
                 }
                 else
                 {
                     query = string.Format("webservice/rest/server.php" +
                                           "?wstoken={0}&moodlewsrestformat={1}&wsfunction={2}&serviceshortnames[0]={3}",
-                        ApiToken, ParseFormat(Format.JSON), ParseMethod(Methods.core_webservice_get_site_info),
+                        apiToken, ParseFormat(Format.JSON), ParseMethod(Methods.core_webservice_get_site_info),
                         serviceHostName);
                 }
 
-                return Get<Site_info>(Host.AbsoluteUri + query);
+                return Get<Site_info>(host.AbsoluteUri + query, cancellationToken);
             }
             else
             {
@@ -209,9 +180,7 @@ namespace MoodleApiWrapper
                     throw new Exception("Token is not set");
             }
         }
-        #endregion
 
-        #region User Actions 
         /// <summary>
         /// Search for users matching the parameters of the call. This call will return matching user accounts with profile fields.
         ///  The key/value pairs to be considered in user search. Values can not be empty. Specify different keys only once
@@ -232,8 +201,7 @@ namespace MoodleApiWrapper
         /// <param names="criteria_key1">Key of the second search parameter.</param>
         /// <param names="criteria_value1">Value of the second search term.</param>
         /// <returns></returns>
-        public static Task<ApiResponse<Users>> GetUsers(string criteria_key0, string criteria_value0,
-            string criteria_key1 = "", string criteria_value1 = "")
+        public Task<ApiResponse<Users>> GetUsers(string criteria_key0, string criteria_value0, string criteria_key1 = "", string criteria_value1 = "", CancellationToken cancellationToken = default)
         {
             if (HostIsSet && TokenIsSet)
             {
@@ -242,7 +210,7 @@ namespace MoodleApiWrapper
                 {
                     query =
                         "webservice/rest/server.php?" +
-                        $"wstoken={ApiToken}&" +
+                        $"wstoken={apiToken}&" +
                         $"wsfunction={ParseMethod(Methods.core_user_get_users)}&" +
                         $"moodlewsrestformat={ParseFormat(Format.JSON)}&" +
                         $"criteria[0][key]={criteria_key0}&" +
@@ -254,15 +222,14 @@ namespace MoodleApiWrapper
                 {
                     query =
                         "webservice/rest/server.php?" +
-                        $"wstoken={ApiToken}&" +
+                        $"wstoken={apiToken}&" +
                         $"wsfunction={ParseMethod(Methods.core_user_get_users)}&" +
                         $"moodlewsrestformat={ParseFormat(Format.JSON)}&" +
                         $"criteria[0][key]={criteria_key0}&" +
                         $"criteria[0][value]={criteria_value0}";
                 }
-                return Get<Users>(Host.AbsoluteUri + query);
 
-
+                return Get<Users>(host.AbsoluteUri + query, cancellationToken);
             }
             else
             {
@@ -290,30 +257,28 @@ namespace MoodleApiWrapper
         /// <param names="criteria_key">Key of the first search parameter.</param>
         /// <param names="criteria_value">Value of the first search term.</param>
         /// <returns></returns>
-        public static Task<ApiResponse<Users>> GetUsersByField(string criteria_key, string criteria_value)
+        public Task<ApiResponse<Users>> GetUsersByField(string criteria_key, string criteria_value, CancellationToken cancellationToken = default)
         {
             if (HostIsSet && TokenIsSet)
             {
                 string query = string.Empty;
                 query =
                     "webservice/rest/server.php?" +
-                    $"wstoken={ApiToken}&" +
+                    $"wstoken={apiToken}&" +
                     $"wsfunction={ParseMethod(Methods.core_user_get_users_by_field)}&" +
                     $"moodlewsrestformat={ParseFormat(Format.JSON)}&" +
                     $"criteria[0][key]={criteria_key}&" +
                     $"criteria[0][value]={criteria_value}";
 
-                return Get<Users>(Host.AbsoluteUri + query);
+                return Get<Users>(host.AbsoluteUri + query, cancellationToken);
             }
+
+            if (!HostIsSet && TokenIsSet)
+                throw new Exception("Host & token are not set");
+            else if (!HostIsSet)
+                throw new Exception("Host is not set");
             else
-            {
-                if (!HostIsSet && TokenIsSet)
-                    throw new Exception("Host & token are not set");
-                else if (!HostIsSet)
-                    throw new Exception("Host is not set");
-                else
-                    throw new Exception("Token is not set");
-            }
+                throw new Exception("Token is not set");
         }
 
         /// <summary>
@@ -321,19 +286,19 @@ namespace MoodleApiWrapper
         /// </summary>
         /// <param names="userid"></param>
         /// <returns></returns>
-        public static Task<ApiResponse<Cources>> GetUserCourses(int userid)
+        public Task<ApiResponse<Cources>> GetUserCourses(int userid, CancellationToken cancellationToken = default)
         {
             if (HostIsSet && TokenIsSet)
             {
                 string query = string.Empty;
                 query =
                     "webservice/rest/server.php?" +
-                    $"wstoken={ApiToken}&" +
+                    $"wstoken={apiToken}&" +
                     $"wsfunction={ParseMethod(Methods.core_enrol_get_users_courses)}&" +
                     $"moodlewsrestformat={ParseFormat(Format.JSON)}&" +
                     $"userid={userid}";
 
-                return Get<Cources>(Host.AbsoluteUri + query);
+                return Get<Cources>(host.AbsoluteUri + query, cancellationToken);
             }
             else
             {
@@ -373,7 +338,7 @@ namespace MoodleApiWrapper
         /// <param names="customfields_type"></param>
         /// <param names="customfields_value"></param>
         /// <returns></returns>
-        public static Task<ApiResponse<NewUser>> CreateUser(string username, string firstname, string lastname,
+        public Task<ApiResponse<NewUser>> CreateUser(string username, string firstname, string lastname,
             string email, string password,
             string auth = "", string idnumber = "", string lang = "", string calendartye = "", string theme = "",
             string timezone = "",
@@ -381,14 +346,14 @@ namespace MoodleApiWrapper
             string firstnamephonetic = "",
             string lastnamephonetic = "", string middlename = "", string alternatename = "",
             string preferences_type = "", string preferences_value = "",
-            string customfields_type = "", string customfields_value = "")
+            string customfields_type = "", string customfields_value = "", CancellationToken cancellationToken = default)
         {
             if (HostIsSet && TokenIsSet)
             {
                 StringBuilder querybuilder = new StringBuilder();
                 querybuilder.Append(
                     "webservice/rest/server.php?" +
-                    $"wstoken={ApiToken}&wsfunction={ParseMethod(Methods.core_user_create_users)}&" +
+                    $"wstoken={apiToken}&wsfunction={ParseMethod(Methods.core_user_create_users)}&" +
                     $"moodlewsrestformat={ParseFormat(Format.JSON)}&" +
                     $"users[0][username]={@username}&" +
                     $"users[0][password]={@password}&" +
@@ -415,7 +380,7 @@ namespace MoodleApiWrapper
                 if (customfields_value.Any()) querybuilder.Append($"&users[0][auth]={customfields_value}");
 
 
-                return Get<NewUser>(Host.AbsoluteUri + querybuilder.ToString());
+                return Get<NewUser>(host.AbsoluteUri + querybuilder.ToString(), cancellationToken);
             }
             else
             {
@@ -427,7 +392,6 @@ namespace MoodleApiWrapper
                     throw new Exception("Token is not set");
             }
         }
-
 
         /// <summary>
         /// Updates a user.
@@ -457,7 +421,7 @@ namespace MoodleApiWrapper
         /// <param names="customfields_type"></param>
         /// <param names="customfields_value"></param>
         /// <returns></returns>
-        public static Task<ApiResponse<Success>> UpdateUser(int id, string username = "", string firstname = "",
+        public Task<ApiResponse<Success>> UpdateUser(int id, string username = "", string firstname = "",
             string lastname = "",
             string email = "", string password = "", string auth = "", string idnumber = "", string lang = "",
             string calendartye = "", string theme = "",
@@ -465,14 +429,14 @@ namespace MoodleApiWrapper
             string firstnamephonetic = "",
             string lastnamephonetic = "", string middlename = "", string alternatename = "",
             string preferences_type = "", string preferences_value = "",
-            string customfields_type = "", string customfields_value = "")
+            string customfields_type = "", string customfields_value = "", CancellationToken cancellationToken = default)
         {
             if (HostIsSet && TokenIsSet)
             {
                 StringBuilder querybuilder = new StringBuilder();
                 querybuilder.Append(
                     "webservice/rest/server.php?" +
-                    $"wstoken={ApiToken}&wsfunction={ParseMethod(Methods.core_user_update_users)}&" +
+                    $"wstoken={apiToken}&wsfunction={ParseMethod(Methods.core_user_update_users)}&" +
                     $"moodlewsrestformat={ParseFormat(Format.JSON)}&" +
                     $"users[0][id]={id}");
 
@@ -501,7 +465,7 @@ namespace MoodleApiWrapper
                 if (customfields_value.Any()) querybuilder.Append($"&users[0][auth]={customfields_value}");
 
 
-                return Get<Success>(Host.AbsoluteUri + querybuilder.ToString());
+                return Get<Success>(host.AbsoluteUri + querybuilder.ToString(), cancellationToken);
             }
             else
             {
@@ -519,19 +483,19 @@ namespace MoodleApiWrapper
         /// </summary>
         /// <param names="id"></param>
         /// <returns></returns>
-        public static Task<ApiResponse<Success>> DeleteUser(int id)
+        public Task<ApiResponse<Success>> DeleteUser(int id, CancellationToken cancellationToken = default)
         {
             if (HostIsSet && TokenIsSet)
             {
                 string query = string.Empty;
                 query =
                     "webservice/rest/server.php?" +
-                    $"wstoken={ApiToken}&" +
+                    $"wstoken={apiToken}&" +
                     $"wsfunction={ParseMethod(Methods.core_user_delete_users)}&" +
                     $"moodlewsrestformat={ParseFormat(Format.JSON)}&" +
                     $"userids[0]={id}";
 
-                return Get<Success>(Host.AbsoluteUri + query);
+                return Get<Success>(host.AbsoluteUri + query, cancellationToken);
             }
             else
             {
@@ -542,7 +506,6 @@ namespace MoodleApiWrapper
                 else
                     throw new Exception("Token is not set");
             }
-
         }
 
         /// <summary>
@@ -556,15 +519,15 @@ namespace MoodleApiWrapper
         /// <param names="context_level"></param>
         /// <param names="instance_id"></param>
         /// <returns></returns>
-        public static Task<ApiResponse<Success>> AssignRoles(int role_id, int user_id, string context_id = "",
-            string context_level = "", int instance_id = Int32.MinValue)
+        public Task<ApiResponse<Success>> AssignRoles(int role_id, int user_id, string context_id = "",
+            string context_level = "", int instance_id = Int32.MinValue, CancellationToken cancellationToken = default)
         {
             if (HostIsSet && TokenIsSet)
             {
                 StringBuilder query = new StringBuilder();
                 query.Append(
                     "webservice/rest/server.php?" +
-                    $"wstoken={ApiToken}&" +
+                    $"wstoken={apiToken}&" +
                     $"wsfunction={ParseMethod(Methods.core_role_assign_roles)}&" +
                     $"moodlewsrestformat={ParseFormat(Format.JSON)}&" +
                     $"assignments[0][roleid]={role_id}&" +
@@ -573,7 +536,7 @@ namespace MoodleApiWrapper
                 if (context_level.Any()) query.Append($"&assignments[0][contextlevel]={context_level}");
                 if (instance_id != Int32.MinValue) query.Append($"&assignments[0][instanceid]={instance_id}");
 
-                return Get<Success>(Host.AbsoluteUri + query);
+                return Get<Success>(host.AbsoluteUri + query, cancellationToken);
             }
             else
             {
@@ -584,7 +547,6 @@ namespace MoodleApiWrapper
                 else
                     throw new Exception("Token is not set");
             }
-
         }
 
         /// <summary>
@@ -596,15 +558,15 @@ namespace MoodleApiWrapper
         /// <param names="context_level"></param>
         /// <param names="instance_id"></param>
         /// <returns></returns>
-        public static Task<ApiResponse<Success>> UnassignRoles(int role_id, int user_id, string context_id = "",
-           string context_level = "", int instance_id = Int32.MinValue)
+        public Task<ApiResponse<Success>> UnassignRoles(int role_id, int user_id, string context_id = "",
+            string context_level = "", int instance_id = Int32.MinValue, CancellationToken cancellationToken = default)
         {
             if (HostIsSet && TokenIsSet)
             {
                 StringBuilder query = new StringBuilder();
                 query.Append(
                     "webservice/rest/server.php?" +
-                    $"wstoken={ApiToken}&" +
+                    $"wstoken={apiToken}&" +
                     $"wsfunction={ParseMethod(Methods.core_role_unassign_roles)}&" +
                     $"moodlewsrestformat={ParseFormat(Format.JSON)}&" +
                     $"unassignments[0][roleid]={role_id}&" +
@@ -613,7 +575,7 @@ namespace MoodleApiWrapper
                 if (context_level.Any()) query.Append($"&unassignments[0][contextlevel]={context_level}");
                 if (instance_id != Int32.MinValue) query.Append($"&unassignments[0][instanceid]={instance_id}");
 
-                return Get<Success>(Host.AbsoluteUri + query);
+                return Get<Success>(host.AbsoluteUri + query, cancellationToken);
             }
             else
             {
@@ -626,9 +588,6 @@ namespace MoodleApiWrapper
             }
         }
 
-        #endregion
-
-        #region Course Enrollment Actions
         /// <summary>
         /// 
         /// </summary>
@@ -639,25 +598,25 @@ namespace MoodleApiWrapper
         /// <param names="timeend"></param>
         /// <param names="suspend"></param>
         /// <returns></returns>
-        public static Task<ApiResponse<Success>> EnrolUser(int role_id, int user_id, int cource_id,
-                                                            int timestart = Int32.MinValue, int timeend = Int32.MinValue, int suspend = Int32.MinValue)
+        public Task<ApiResponse<Success>> EnrolUser(int role_id, int user_id, int cource_id,
+            int timestart = Int32.MinValue, int timeend = Int32.MinValue, int suspend = Int32.MinValue, CancellationToken cancellationToken = default)
         {
             if (HostIsSet && TokenIsSet)
             {
                 StringBuilder query = new StringBuilder();
                 query.Append(
                     "webservice/rest/server.php?" +
-                    $"wstoken={ApiToken}&" +
+                    $"wstoken={apiToken}&" +
                     $"wsfunction={ParseMethod(Methods.enrol_manual_enrol_users)}&" +
                     $"moodlewsrestformat={ParseFormat(Format.JSON)}&" +
                     $"enrolments[0][roleid]={role_id}&" +
-                    $"enrolments[0][userid]={user_id}&" + 
+                    $"enrolments[0][userid]={user_id}&" +
                     $"enrolments[0][courceid]={cource_id}");
                 if (timestart != Int32.MinValue) query.Append($"&enrolments[0][timestart]={timestart}");
                 if (timeend != Int32.MinValue) query.Append($"&enrolments[0][timeend]={timeend}");
                 if (suspend != Int32.MinValue) query.Append($"&enrolments[0][suspend]={suspend}");
 
-                return Get<Success>(Host.AbsoluteUri + query);
+                return Get<Success>(host.AbsoluteUri + query, cancellationToken);
             }
             else
             {
@@ -676,20 +635,20 @@ namespace MoodleApiWrapper
         /// <param names="group_id"></param>
         /// <param names="user_id"></param>
         /// <returns></returns>
-        public static Task<ApiResponse<Success>> AddGroupMember(int group_id, int user_id)
+        public Task<ApiResponse<Success>> AddGroupMember(int group_id, int user_id, CancellationToken cancellationToken = default)
         {
             if (HostIsSet && TokenIsSet)
             {
                 StringBuilder query = new StringBuilder();
                 query.Append(
                     "webservice/rest/server.php?" +
-                    $"wstoken={ApiToken}&" +
+                    $"wstoken={apiToken}&" +
                     $"wsfunction={ParseMethod(Methods.core_group_add_group_members)}&" +
                     $"moodlewsrestformat={ParseFormat(Format.JSON)}&" +
                     $"members[0][groupid]={group_id}&" +
-                    $"members[0][userid]={user_id}");               
+                    $"members[0][userid]={user_id}");
 
-                return Get<Success>(Host.AbsoluteUri + query);
+                return Get<Success>(host.AbsoluteUri + query, cancellationToken);
             }
             else
             {
@@ -708,20 +667,20 @@ namespace MoodleApiWrapper
         /// <param names="group_id"></param>
         /// <param names="user_id"></param>
         /// <returns></returns>
-        public static Task<ApiResponse<Success>> DeleteGroupMember(int group_id, int user_id)
+        public Task<ApiResponse<Success>> DeleteGroupMember(int group_id, int user_id, CancellationToken cancellationToken = default)
         {
             if (HostIsSet && TokenIsSet)
             {
                 StringBuilder query = new StringBuilder();
                 query.Append(
                     "webservice/rest/server.php?" +
-                    $"wstoken={ApiToken}&" +
+                    $"wstoken={apiToken}&" +
                     $"wsfunction={ParseMethod(Methods.core_group_delete_group_members)}&" +
                     $"moodlewsrestformat={ParseFormat(Format.JSON)}&" +
                     $"members[0][groupid]={group_id}&" +
                     $"members[0][userid]={user_id}");
 
-                return Get<Success>(Host.AbsoluteUri + query);
+                return Get<Success>(host.AbsoluteUri + query, cancellationToken);
             }
             else
             {
@@ -734,11 +693,6 @@ namespace MoodleApiWrapper
             }
         }
 
-
-        #endregion
-
-        #region Course Actions
-       
         /// <summary>
         /// Get a listing of categories in the system. 
         /// </summary>
@@ -755,14 +709,14 @@ namespace MoodleApiWrapper
         /// <param names="criteria_value"><summary>Criteria[0][value] - The value to match</summary></param>
         /// <param names="addSubCategories"><summary>Return the sub categories infos (1 - default) otherwise only the category info (0)</summary></param>
         /// <returns></returns>
-        public static Task<ApiResponse<Category>> GetCategories(string criteria_key, string criteria_value, int addSubCategories = 1 )
+        public Task<ApiResponse<Category>> GetCategories(string criteria_key, string criteria_value, int addSubCategories = 1, CancellationToken cancellationToken = default)
         {
             if (HostIsSet && TokenIsSet)
             {
                 StringBuilder query = new StringBuilder();
                 query.Append(
                     "webservice/rest/server.php?" +
-                    $"wstoken={ApiToken}&" +
+                    $"wstoken={apiToken}&" +
                     $"wsfunction={ParseMethod(Methods.core_course_get_categories)}&" +
                     $"moodlewsrestformat={ParseFormat(Format.JSON)}&" +
                     $"criteria[0][key]={criteria_key}&" +
@@ -770,7 +724,7 @@ namespace MoodleApiWrapper
 
                 if (addSubCategories != 1) query.Append($"&addsubcategories={addSubCategories}");
 
-                return Get<Category>(Host.AbsoluteUri + query);
+                return Get<Category>(host.AbsoluteUri + query, cancellationToken);
             }
             else
             {
@@ -788,29 +742,28 @@ namespace MoodleApiWrapper
         /// </summary>
         /// <param names="options"><summary>List of course id.If empty return all courses except front page course.</summary></param>
         /// <returns></returns>
-        public static Task<ApiResponse<Course>> GetCourses(int options = int.MinValue)
+        public Task<ApiResponse<Course>> GetCourses(int options = int.MinValue, CancellationToken cancellationToken = default)
         {
             if (HostIsSet && TokenIsSet)
             {
                 StringBuilder query = new StringBuilder();
                 query.Append(
                     "webservice/rest/server.php?" +
-                    $"wstoken={ApiToken}&" +
+                    $"wstoken={apiToken}&" +
                     $"wsfunction={ParseMethod(Methods.core_course_get_courses)}&" +
-                    $"moodlewsrestformat={ParseFormat(Format.JSON)}"); 
-                    if (options != int.MinValue) query.Append($"&addsubcategories={options}");
+                    $"moodlewsrestformat={ParseFormat(Format.JSON)}");
+                if (options != int.MinValue) query.Append($"&addsubcategories={options}");
 
-                return Get<Course>(Host.AbsoluteUri + query);
+                return Get<Course>(host.AbsoluteUri + query, cancellationToken);
             }
-            else
-            {
-                if (!HostIsSet && TokenIsSet)
-                    throw new Exception("Host & token are not set");
-                else if (!HostIsSet)
-                    throw new Exception("Host is not set");
-                else
-                    throw new Exception("Token is not set");
-            }
+
+            if (!HostIsSet && TokenIsSet)
+                throw new Exception("Host & token are not set");
+
+            if (!HostIsSet)
+                throw new Exception("Host is not set");
+
+            throw new Exception("Token is not set");
         }
 
         /// <summary>
@@ -818,19 +771,19 @@ namespace MoodleApiWrapper
         /// </summary>
         /// <param names="course_id"><summary>Course Id</summary></param>
         /// <returns></returns>
-        public static Task<ApiResponse<Content>> GetContents(int course_id)
+        public Task<ApiResponse<Content>> GetContents(int course_id, CancellationToken cancellationToken = default)
         {
             if (HostIsSet && TokenIsSet)
             {
                 StringBuilder query = new StringBuilder();
                 query.Append(
                     "webservice/rest/server.php?" +
-                    $"wstoken={ApiToken}&" +
+                    $"wstoken={apiToken}&" +
                     $"wsfunction={ParseMethod(Methods.core_course_get_contents)}&" +
-                    $"moodlewsrestformat={ParseFormat(Format.JSON)}&"+
+                    $"moodlewsrestformat={ParseFormat(Format.JSON)}&" +
                     $"courseid={course_id}");
-                
-                return Get<Content>(Host.AbsoluteUri + query);
+
+                return Get<Content>(host.AbsoluteUri + query, cancellationToken);
             }
             else
             {
@@ -848,19 +801,19 @@ namespace MoodleApiWrapper
         /// </summary>
         /// <param names="group_id">Group id</param>
         /// <returns></returns>
-        public static Task<ApiResponse<Group>> GetGroup(int group_id)
+        public Task<ApiResponse<Group>> GetGroup(int group_id, CancellationToken cancellationToken = default)
         {
             if (HostIsSet && TokenIsSet)
             {
                 StringBuilder query = new StringBuilder();
                 query.Append(
                     "webservice/rest/server.php?" +
-                    $"wstoken={ApiToken}&" +
+                    $"wstoken={apiToken}&" +
                     $"wsfunction={ParseMethod(Methods.core_group_get_groups)}&" +
                     $"moodlewsrestformat={ParseFormat(Format.JSON)}&" +
                     $"groupids[0]={group_id}");
 
-                return Get<Group>(Host.AbsoluteUri + query);
+                return Get<Group>(host.AbsoluteUri + query, cancellationToken);
             }
             else
             {
@@ -872,19 +825,20 @@ namespace MoodleApiWrapper
                     throw new Exception("Token is not set");
             }
         }
+
         /// <summary>
         /// Returns group details. 
         /// </summary>
         /// <param names="group_ids"><summary>Group Ids</summary></param>
         /// <returns></returns>
-        public static Task<ApiResponse<Group>> GetGroups(int[] group_ids)
+        public Task<ApiResponse<Group>> GetGroups(int[] group_ids, CancellationToken cancellationToken = default)
         {
             if (HostIsSet && TokenIsSet)
             {
                 StringBuilder query = new StringBuilder();
                 query.Append(
                     "webservice/rest/server.php?" +
-                    $"wstoken={ApiToken}&" +
+                    $"wstoken={apiToken}&" +
                     $"wsfunction={ParseMethod(Methods.core_group_get_groups)}&" +
                     $"moodlewsrestformat={ParseFormat(Format.JSON)}");
 
@@ -893,7 +847,7 @@ namespace MoodleApiWrapper
                     query.Append($"&groupids[{i}]={group_ids[i]}");
                 }
 
-                return Get<Group>(Host.AbsoluteUri + query);
+                return Get<Group>(host.AbsoluteUri + query, cancellationToken);
             }
             else
             {
@@ -911,19 +865,19 @@ namespace MoodleApiWrapper
         /// </summary>
         /// <param names="course_id"><summary>Course Id</summary></param>
         /// <returns></returns>
-        public static Task<ApiResponse<Group>> GetCourseGroups(int course_id)
+        public Task<ApiResponse<Group>> GetCourseGroups(int course_id, CancellationToken cancellationToken = default)
         {
             if (HostIsSet && TokenIsSet)
             {
                 StringBuilder query = new StringBuilder();
                 query.Append(
                     "webservice/rest/server.php?" +
-                    $"wstoken={ApiToken}&" +
+                    $"wstoken={apiToken}&" +
                     $"wsfunction={ParseMethod(Methods.core_group_get_course_groups)}&" +
-                    $"moodlewsrestformat={ParseFormat(Format.JSON)}&"+
+                    $"moodlewsrestformat={ParseFormat(Format.JSON)}&" +
                     $"courseid={course_id}");
 
-                return Get<Group>(Host.AbsoluteUri + query);
+                return Get<Group>(host.AbsoluteUri + query, cancellationToken);
             }
             else
             {
@@ -941,19 +895,19 @@ namespace MoodleApiWrapper
         /// </summary>
         /// <param names="course_id"></param>
         /// <returns></returns>
-        public static Task<ApiResponse<EnrolledUser>> GetEnrolledUsersByCourse(int course_id)
+        public Task<ApiResponse<EnrolledUser>> GetEnrolledUsersByCourse(int course_id, CancellationToken cancellationToken = default)
         {
             if (HostIsSet && TokenIsSet)
             {
                 StringBuilder query = new StringBuilder();
                 query.Append(
                     "webservice/rest/server.php?" +
-                    $"wstoken={ApiToken}&" +
+                    $"wstoken={apiToken}&" +
                     $"wsfunction={ParseMethod(Methods.core_enrol_get_enrolled_users)}&" +
                     $"moodlewsrestformat={ParseFormat(Format.JSON)}&" +
                     $"courseid={course_id}");
 
-                return Get<EnrolledUser>(Host.AbsoluteUri + query);
+                return Get<EnrolledUser>(host.AbsoluteUri + query, cancellationToken);
             }
             else
             {
@@ -994,58 +948,51 @@ namespace MoodleApiWrapper
         /// <param names="courcCourseformatoption"><summary>Optional //additional options for particular course format list of ( object { names string //course format option names
         ///value string //course format option value } )} )</summary></param>
         /// <returns></returns>
-        public static Task<ApiResponse<NewCourse>> CreateCourse(string fullname, string shortname, int category_id,
-            string idnumber = "", string summary = "", int summaryformat = 1, string format = "", int showgrades = 0, int newsitems = 0,
-            DateTime startdate = default(DateTime), int numsections = int.MaxValue, int maxbytes = 104857600, int showreports = 1, 
-            int visible = 0, int hiddensections = int.MaxValue, int groupmode = 0,
-            int groupmodeforce = 0, int defaultgroupingid = 0, int enablecompletion = int.MaxValue,
-            int completenotify = 0, string lang = "", string forcetheme = "",
-            string courcCourseformatoption = ""/*not implemented*/)
+        public Task<ApiResponse<NewCourse>> CreateCourse(CourseModel course, CancellationToken cancellationToken = default)
         {
             if (HostIsSet && TokenIsSet)
             {
                 StringBuilder query = new StringBuilder();
                 query.Append(
                     "webservice/rest/server.php?" +
-                    $"wstoken={ApiToken}&" +
+                    $"wstoken={apiToken}&" +
                     $"wsfunction={ParseMethod(Methods.core_course_create_courses)}&" +
                     $"moodlewsrestformat={ParseFormat(Format.JSON)}&" +
-                    $"courses[0][fullname]={fullname}&"+
-                    $"courses[0][shortname]={shortname}&"+
-                    $"courses[0][categoryid]={category_id}");
+                    $"courses[0][fullname]={course.Fullname}&" +
+                    $"courses[0][shortname]={course.Shortname}&" +
+                    $"courses[0][categoryid]={course.CategoryId}");
 
-                if(idnumber.Any()) query.Append($"&courses[0][idnumber]={idnumber}");
-                if (summary.Any()) query.Append($"&courses[0][summary]={summary}");
-                if (summaryformat != 1) query.Append($"&courses[0][summaryformat ]={summaryformat}");
-                if (format.Any()) query.Append($"&courses[0][format]={format}");
-                if (showgrades != 0) query.Append($"&courses[0][showgrades]={showgrades}");
-                if (!startdate.Equals(default(DateTime))) query.Append($"&courses[0][startdate]={DateTimeToUnixTimestamp(startdate)}");
-                if (newsitems!=0) query.Append($"&courses[0][newsitems]={newsitems}");
-                if (numsections != int.MaxValue) query.Append($"&courses[0][numsections]={numsections}");
-                if (maxbytes != 104857600) query.Append($"&courses[0][maxbytes]={category_id}");
-                if (showreports != 1) query.Append($"&courses[0][showreports]={showreports}");
-                if (visible != 0) query.Append($"&courses[0][visible]={visible}");
-                if (hiddensections != int.MaxValue) query.Append($"&courses[0][hiddensections]={hiddensections}");
-                if (groupmode != 0) query.Append($"&courses[0][groupmode]={groupmode}");
-                if (groupmodeforce != 0) query.Append($"&courses[0][groupmodeforce]={groupmodeforce}");
-                if (defaultgroupingid != 0) query.Append($"&courses[0][defaultgroupingid]={defaultgroupingid}");
-                if (enablecompletion != int.MaxValue) query.Append($"&courses[0][enablecompletion]={enablecompletion}");
-                if (completenotify != 0) query.Append($"&courses[0][completenotify]={completenotify}");
-                if (lang.Any()) query.Append($"&courses[0][lang]={lang}");
-                if (forcetheme.Any()) query.Append($"&courses[0][forcetheme]={forcetheme}");
+                if (course.idnumber.Any()) query.Append($"&courses[0][idnumber]={course.idnumber}");
+                if (course.summary.Any()) query.Append($"&courses[0][summary]={course.summary}");
+                if (course.summaryformat != 1) query.Append($"&courses[0][summaryformat ]={course.summaryformat}");
+                if (course.format.Any()) query.Append($"&courses[0][format]={course.format}");
+                if (course.showgrades != 0) query.Append($"&courses[0][showgrades]={course.showgrades}");
+                if (!course.startdate.Equals(default(DateTime))) query.Append($"&courses[0][startdate]={DateTimeToUnixTimestamp(course.startdate)}");
+                if (course.newsitems != 0) query.Append($"&courses[0][newsitems]={course.newsitems}");
+                if (course.numsections != int.MaxValue) query.Append($"&courses[0][numsections]={course.numsections}");
+                if (course.maxbytes != 104857600) query.Append($"&courses[0][maxbytes]={course.CategoryId}");
+                if (course.showreports != 1) query.Append($"&courses[0][showreports]={course.showreports}");
+                if (course.visible != 0) query.Append($"&courses[0][visible]={course.visible}");
+                if (course.hiddensections != int.MaxValue) query.Append($"&courses[0][hiddensections]={course.hiddensections}");
+                if (course.groupmode != 0) query.Append($"&courses[0][groupmode]={course.groupmode}");
+                if (course.groupmodeforce != 0) query.Append($"&courses[0][groupmodeforce]={course.groupmodeforce}");
+                if (course.defaultgroupingid != 0) query.Append($"&courses[0][defaultgroupingid]={course.defaultgroupingid}");
+                if (course.enablecompletion != int.MaxValue) query.Append($"&courses[0][enablecompletion]={course.enablecompletion}");
+                if (course.completenotify != 0) query.Append($"&courses[0][completenotify]={course.completenotify}");
+                if (course.lang.Any()) query.Append($"&courses[0][lang]={course.lang}");
+                if (course.forcetheme.Any()) query.Append($"&courses[0][forcetheme]={course.forcetheme}");
 
-                return Get<NewCourse>(Host.AbsoluteUri + query);
+                return Get<NewCourse>(host.AbsoluteUri + query, cancellationToken);
             }
-            else
-            {
-                if (!HostIsSet && TokenIsSet)
-                    throw new Exception("Host & token are not set");
-                else if (!HostIsSet)
-                    throw new Exception("Host is not set");
-                else
-                    throw new Exception("Token is not set");
-            }
+
+            if (!HostIsSet && TokenIsSet)
+                throw new Exception("Host & token are not set");
+            if (!HostIsSet)
+                throw new Exception("Host is not set");
+                
+            throw new Exception("Token is not set");
         }
+
         /// <summary>
         /// Create new courses
         /// </summary>
@@ -1053,51 +1000,51 @@ namespace MoodleApiWrapper
         /// <param names="shortname"></param>
         /// <param names="category_ids"></param>
         /// <returns></returns>
-        public static Task<ApiResponse<NewCourse>> CreateCourses(string[] fullname, string[] shortname,int[] category_ids)
+        public Task<ApiResponse<NewCourse>> CreateCourses(CourseModel[] courses, int[] category_ids = default, CancellationToken cancellationToken = default)
         {
             if (HostIsSet && TokenIsSet)
             {
                 StringBuilder query = new StringBuilder();
                 query.Append(
                     "webservice/rest/server.php?" +
-                    $"wstoken={ApiToken}&" +
+                    $"wstoken={apiToken}&" +
                     $"wsfunction={ParseMethod(Methods.core_course_create_courses)}&" +
                     $"moodlewsrestformat={ParseFormat(Format.JSON)}");
-                for (int i = 0; i < fullname.Count(); i++)
+
+                for (var i = 0; i < courses.Length; i++)
                 {
-                    query.Append(
-                        $"&courses[{i}][fullname]={fullname[i]}" +
-                        $"&courses[{i}][shortname]={shortname[i]}" +
-                        $"&courses[{i}][categoryid]={category_ids[i]}");
+                    var course = courses[i];
+                    
+                    query.Append($"&courses[{i}][{nameof(course.Fullname).ToLower()}]={course.Fullname}");
+                    query.Append($"&courses[{i}][{nameof(course.Shortname).ToLower()}]={course.Shortname}");
+                    query.Append($"&courses[{i}][{nameof(course.CategoryId).ToLower()}]={course.CategoryId}");
                 }
 
-                return Get<NewCourse>(Host.AbsoluteUri + query);
+                return Get<NewCourse>(host.AbsoluteUri + query, cancellationToken);
             }
-            else
-            {
-                if (!HostIsSet && TokenIsSet)
-                    throw new Exception("Host & token are not set");
-                else if (!HostIsSet)
-                    throw new Exception("Host is not set");
-                else
-                    throw new Exception("Token is not set");
-            }
+
+            if (!HostIsSet && TokenIsSet)
+                throw new Exception("Host & token are not set");
+            if (!HostIsSet)
+                throw new Exception("Host is not set");
+
+            throw new Exception("Token is not set");
         }
 
-        public static Task<ApiResponse<UpdateCourseRoot>> UpdateCourse(int id, string fullname = "", string shortname = "", int category_id = Int32.MaxValue,
-    string idnumber = "", string summary = "", int summaryformat = 1, string format = "", int showgrades = 0, int newsitems = 0,
-    DateTime startdate = default(DateTime), int numsections = int.MaxValue, int maxbytes = 104857600, int showreports = 1,
-    int visible = 0, int hiddensections = int.MaxValue, int groupmode = 0,
-    int groupmodeforce = 0, int defaultgroupingid = 0, int enablecompletion = int.MaxValue,
-    int completenotify = 0, string lang = "", string forcetheme = "",
-    string courcCourseformatoption = ""/*not implemented*/)
+        public Task<ApiResponse<UpdateCourseRoot>> UpdateCourse(int id, string fullname = "", string shortname = "", int category_id = Int32.MaxValue,
+            string idnumber = "", string summary = "", int summaryformat = 1, string format = "", int showgrades = 0, int newsitems = 0,
+            DateTime startdate = default(DateTime), int numsections = int.MaxValue, int maxbytes = 104857600, int showreports = 1,
+            int visible = 0, int hiddensections = int.MaxValue, int groupmode = 0,
+            int groupmodeforce = 0, int defaultgroupingid = 0, int enablecompletion = int.MaxValue,
+            int completenotify = 0, string lang = "", string forcetheme = "",
+            string courcCourseformatoption = "" /*not implemented*/, CancellationToken cancellationToken = default)
         {
             if (HostIsSet && TokenIsSet)
             {
                 StringBuilder query = new StringBuilder();
                 query.Append(
                     "webservice/rest/server.php?" +
-                    $"wstoken={ApiToken}&" +
+                    $"wstoken={apiToken}&" +
                     $"wsfunction={ParseMethod(Methods.core_course_update_courses)}&" +
                     $"moodlewsrestformat={ParseFormat(Format.JSON)}&" +
                     $"courses[0][id]={id}");
@@ -1125,7 +1072,7 @@ namespace MoodleApiWrapper
                 if (lang.Any()) query.Append($"&courses[0][lang]={lang}");
                 if (forcetheme.Any()) query.Append($"&courses[0][forcetheme]={forcetheme}");
 
-                return Get<UpdateCourseRoot>(Host.AbsoluteUri + query);
+                return Get<UpdateCourseRoot>(host.AbsoluteUri + query, cancellationToken);
             }
             else
             {
@@ -1138,10 +1085,6 @@ namespace MoodleApiWrapper
             }
         }
 
-        #endregion
-
-        #region Grade Actions
-
         /// <summary>
         /// Returns grade item details and optionally student grades. 
         /// </summary>
@@ -1149,14 +1092,14 @@ namespace MoodleApiWrapper
         /// <param names="criteria_value"></param>
         /// <param names="addSubCategories"></param>
         /// <returns></returns>
-        public static Task<ApiResponse<Category>> GetGrades(int courseid, string component = "", int activityid = Int32.MaxValue, string[] userids = null)
+        public Task<ApiResponse<Category>> GetGrades(int courseid, string component = "", int activityid = Int32.MaxValue, string[] userids = null, CancellationToken cancellationToken = default)
         {
             if (HostIsSet && TokenIsSet)
             {
                 StringBuilder query = new StringBuilder();
                 query.Append(
                     "webservice/rest/server.php?" +
-                    $"wstoken={ApiToken}&" +
+                    $"wstoken={apiToken}&" +
                     $"wsfunction={ParseMethod(Methods.core_grades_get_grades)}&" +
                     $"moodlewsrestformat={ParseFormat(Format.JSON)}&" +
                     $"courseid={courseid}");
@@ -1166,7 +1109,7 @@ namespace MoodleApiWrapper
                 if (userids != null) query.Append($"&userids={userids}");
                 if (component.Any()) query.Append($"&component={component}");
 
-                return Get<Category>(Host.AbsoluteUri + query);
+                return Get<Category>(host.AbsoluteUri + query, cancellationToken);
             }
             else
             {
@@ -1179,11 +1122,6 @@ namespace MoodleApiWrapper
             }
         }
 
-
-
-        #endregion
-
-        #region Calander Actions
         /// <summary>
         /// 
         /// </summary>
@@ -1191,30 +1129,30 @@ namespace MoodleApiWrapper
         /// <param name="courseids"></param>
         /// <param name="eventids"></param>
         /// <returns></returns>
-        public static Task<ApiResponse<Events>> GetCalanderEvents(int[] groupids = default(int[]), int[] courseids = default(int[]),int[] eventids = default(int[]))
+        public Task<ApiResponse<Events>> GetCalanderEvents(int[] groupids = default(int[]), int[] courseids = default(int[]), int[] eventids = default(int[]), CancellationToken cancellationToken = default)
         {
             if (HostIsSet && TokenIsSet)
             {
                 StringBuilder query = new StringBuilder();
                 query.Append(
                     "webservice/rest/server.php?" +
-                    $"wstoken={ApiToken}&" +
+                    $"wstoken={apiToken}&" +
                     $"wsfunction={ParseMethod(Methods.core_calendar_get_calendar_events)}&" +
                     $"moodlewsrestformat={ParseFormat(Format.JSON)}");
 
                 if (groupids != null)
-                    for (int i = 0; i < groupids.Count(); i++)                
+                    for (int i = 0; i < groupids.Count(); i++)
                         query.Append($"&events[groupids][{i}]={groupids[i]}");
 
                 if (courseids != null)
-                    for (int i = 0; i < courseids.Count(); i++)                
+                    for (int i = 0; i < courseids.Count(); i++)
                         query.Append($"&events[courseids][{i}]={courseids[i]}");
-                
-                if(eventids != null)
+
+                if (eventids != null)
                     for (int i = 0; i < eventids.Count(); i++)
                         query.Append($"&events[eventids][{i}]={eventids[i]}");
-                
-            return Get<Events>(Host.AbsoluteUri + query);
+
+                return Get<Events>(host.AbsoluteUri + query, cancellationToken);
             }
             else
             {
@@ -1226,6 +1164,7 @@ namespace MoodleApiWrapper
                     throw new Exception("Token is not set");
             }
         }
+
         /// <summary>
         /// 
         /// </summary>
@@ -1241,17 +1180,17 @@ namespace MoodleApiWrapper
         /// <param name="visible"></param>
         /// <param name="sequences"></param>
         /// <returns></returns>
-        public static Task<ApiResponse<Events>> CreateCalanderEvents(string[] names, string[] descriptions = default(string[]),
-             int[] formats = default(int[]), int[] groupids = default(int[]), int[] courseids = default(int[]), int[] repeats = default(int[]),
-             string[] eventtypes = default(string[]), DateTime[] timestarts = default(DateTime[]), TimeSpan[] timedurations = default(TimeSpan[]),
-             int[] visible = default(int[]), int[] sequences = default(int[]))
+        public Task<ApiResponse<Events>> CreateCalanderEvents(string[] names, string[] descriptions = default(string[]),
+            int[] formats = default(int[]), int[] groupids = default(int[]), int[] courseids = default(int[]), int[] repeats = default(int[]),
+            string[] eventtypes = default(string[]), DateTime[] timestarts = default(DateTime[]), TimeSpan[] timedurations = default(TimeSpan[]),
+            int[] visible = default(int[]), int[] sequences = default(int[]), CancellationToken cancellationToken = default)
         {
             if (HostIsSet && TokenIsSet)
             {
                 StringBuilder query = new StringBuilder();
                 query.Append(
                     "webservice/rest/server.php?" +
-                    $"wstoken={ApiToken}&" +
+                    $"wstoken={apiToken}&" +
                     $"wsfunction={ParseMethod(Methods.core_calendar_create_calendar_events)}&" +
                     $"moodlewsrestformat={ParseFormat(Format.JSON)}");
 
@@ -1294,7 +1233,7 @@ namespace MoodleApiWrapper
                     for (int i = 0; i < sequences.Count(); i++)
                         query.Append($"&events[{i}][sequence]={sequences[i]}");
 
-                return Get<Events>(Host.AbsoluteUri + query);
+                return Get<Events>(host.AbsoluteUri + query, cancellationToken);
             }
             else
             {
@@ -1306,6 +1245,7 @@ namespace MoodleApiWrapper
                     throw new Exception("Token is not set");
             }
         }
+
         /// <summary>
         /// 
         /// </summary>
@@ -1313,14 +1253,14 @@ namespace MoodleApiWrapper
         /// <param name="repeats"></param>
         /// <param name="descriptions"></param>
         /// <returns></returns>
-        public static Task<ApiResponse<Events>> DeleteCalanderEvents(int[] eventids,int[] repeats, string[] descriptions = default(string[]))
+        public Task<ApiResponse<Events>> DeleteCalanderEvents(int[] eventids, int[] repeats, string[] descriptions = default(string[]), CancellationToken cancellationToken = default)
         {
             if (HostIsSet && TokenIsSet)
             {
                 StringBuilder query = new StringBuilder();
                 query.Append(
                     "webservice/rest/server.php?" +
-                    $"wstoken={ApiToken}&" +
+                    $"wstoken={apiToken}&" +
                     $"wsfunction={ParseMethod(Methods.core_calendar_delete_calendar_events)}&" +
                     $"moodlewsrestformat={ParseFormat(Format.JSON)}");
 
@@ -1336,8 +1276,8 @@ namespace MoodleApiWrapper
                 if (descriptions != null)
                     for (int i = 0; i < descriptions.Count(); i++)
                         query.Append($"&events[{i}][description]={descriptions[i]}");
-                
-                return Get<Events>(Host.AbsoluteUri + query);
+
+                return Get<Events>(host.AbsoluteUri + query, cancellationToken);
             }
             else
             {
@@ -1350,9 +1290,6 @@ namespace MoodleApiWrapper
             }
         }
 
-        #endregion
-
-        #region Group Actions
         /// <summary>
         /// 
         /// </summary>
@@ -1363,15 +1300,15 @@ namespace MoodleApiWrapper
         /// <param name="enrolmentkeys"></param>
         /// <param name="idnumbers"></param>
         /// <returns></returns>
-        public static Task<ApiResponse<Group>> CreateGroups(string[] names = default(string[]), int[] courseids = default(int[]), string[] descriptions = default(string[]),
-            int[] descriptionformats = default (int[]), string[] enrolmentkeys = default(string[]),string[] idnumbers = default (string[]))
+        public Task<ApiResponse<Events>> CreateGroups(string[] names = default(string[]), int[] courseids = default(int[]), string[] descriptions = default(string[]),
+            int[] descriptionformats = default(int[]), string[] enrolmentkeys = default(string[]), string[] idnumbers = default(string[]), CancellationToken cancellationToken = default)
         {
             if (HostIsSet && TokenIsSet)
             {
                 StringBuilder query = new StringBuilder();
                 query.Append(
                     "webservice/rest/server.php?" +
-                    $"wstoken={ApiToken}&" +
+                    $"wstoken={apiToken}&" +
                     $"wsfunction=core_group_create_groups&" +
                     $"moodlewsrestformat={ParseFormat(Format.JSON)}");
 
@@ -1400,7 +1337,7 @@ namespace MoodleApiWrapper
                         query.Append($"&groups[{i}][idnumber]={idnumbers[i]}");
 
 
-                return Get<Events>(Host.AbsoluteUri + query);
+                return Get<Events>(host.AbsoluteUri + query, cancellationToken);
             }
             else
             {
@@ -1412,28 +1349,25 @@ namespace MoodleApiWrapper
                     throw new Exception("Token is not set");
             }
         }
-        #endregion
 
-        #region Getters
         /// <summary>
         /// 
         /// </summary>
-        /// <typeparam names="T"></typeparam>
-        /// <param names="uri"></param>
+        /// <param name="client"></param>
+        /// <param name="uri"></param>
+        /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        private static async Task<AuthentiactionResponse<T>> GetAuth<T>(string uri) where T : IDataModel
+        private async Task<AuthentiactionResponse<T>> GetAuth<T>(string uri, CancellationToken cancellationToken) where T : IDataModel
         {
             try
             {
-                var request = WebRequest.Create(Uri.EscapeUriString(uri));
-                using (var response = await request.GetResponseAsync())
-                {
-                    using (var reader = new StreamReader(response.GetResponseStream()))
-                    {
-                        var data = JObject.Parse(await reader.ReadToEndAsync());
-                        return new AuthentiactionResponse<T>(new AuthentiactionResponseRaw(data));
-                    }
-                }
+                using var response = await client.GetAsync(Uri.EscapeDataString(uri), cancellationToken);
+
+                var responseStream = await response.Content.ReadAsStringAsync(cancellationToken);
+
+                var data = JObject.Parse(responseStream);
+
+                return new AuthentiactionResponse<T>(new AuthentiactionResponseRaw(data));
             }
             catch (WebException)
             {
@@ -1448,40 +1382,32 @@ namespace MoodleApiWrapper
         /// <typeparam names="T"></typeparam>
         /// <param names="uri"></param>
         /// <returns></returns>
-        private static async Task<ApiResponse<T>> Get<T>(string uri) where T : IDataModel
+        private async Task<ApiResponse<T>> Get<T>(string uri, CancellationToken cancellationToken) where T : IDataModel
         {
+            var response = await client.GetAsync(Uri.EscapeDataString(uri));
+
+            if (!response.IsSuccessStatusCode) throw new WebException(await response.Content.ReadAsStringAsync(cancellationToken));
+
+            var result = await response.Content.ReadAsStringAsync(cancellationToken);
+
+            if (result.ToLower() == "null")
+                result = "{IsSuccessful: true,}";
+
             try
             {
-                var request = WebRequest.Create(Uri.EscapeUriString(uri));
-                using (var response = await request.GetResponseAsync())
-                {
-                    using (var reader = new StreamReader(response.GetResponseStream()))
-                    {
-                        var result = await reader.ReadToEndAsync();
-                        if (result.ToLower() == "null")
-                            result = "{IsSuccessful: true,}";
-                        try
-                        {
-                            var data = JArray.Parse(result);
-                            return new ApiResponse<T>(new ApiResponseRaw(data));
-                        }
-                        catch(Exception ex)
-                        {
-                            var data = JObject.Parse(result);
-                            return new ApiResponse<T>(new ApiResponseRaw(data));
-                        }
-                    }
-                }
+                var data = JArray.Parse(result);
+                return new ApiResponse<T>(new ApiResponseRaw(data));
             }
-            catch (WebException)
+            catch (Exception ex)
             {
-                // No internet connection
-                throw new WebException("No internet connection.");
+                var data = JObject.Parse(result);
+                return new ApiResponse<T>(new ApiResponseRaw(data));
             }
         }
-        #endregion
-        
-        #endregion
+
+        public void Dispose()
+        {
+            client?.Dispose();
+        }
     }
 }
-
