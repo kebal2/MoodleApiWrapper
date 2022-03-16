@@ -2,12 +2,14 @@
 
 using CommandLine;
 
+using Console;
+
 using MoodleApiWrapper;
 
-using Newtonsoft.Json;
-
+#pragma warning disable CS8600 // Converting null literal or possible null value to non-nullable type.
 Uri host = default;
 string apiToken = default;
+#pragma warning restore CS8600 // Converting null literal or possible null value to non-nullable type.
 int courseCount = 1;
 
 Parser.Default.ParseArguments<Options>(args)
@@ -22,19 +24,9 @@ Parser.Default.ParseArguments<Options>(args)
 
 var moodleApiWrapper = new ApiWrapper(host, apiToken);
 
-var courses = new List<CourseModel>(
-    Enumerable.Range(0, courseCount).Select(i =>
-    {
-        var courseFullName = LoremNET.Lorem.Words(10);
-        var courseShortName = courseFullName.Replace(" ", String.Empty);
+//await moodleApiWrapper.CreateCourses(courseCount);
 
-        return new CourseModel(courseFullName, courseShortName, 1);
-    }));
+await moodleApiWrapper.DeleteCourses();
 
-var result = await moodleApiWrapper.CreateCourses(courses.ToArray());
+System.Console.ReadKey();
 
-var res = JsonConvert.SerializeObject(result);
-
-Console.WriteLine(res);
-
-Console.ReadKey();
