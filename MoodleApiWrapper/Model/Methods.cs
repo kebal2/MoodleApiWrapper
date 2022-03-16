@@ -26,6 +26,7 @@ public enum Methods
     core_enrol_get_enrolled_users,
     core_course_create_courses,
     core_course_update_courses,
+    core_course_delete_courses,
 
     //Grade Actions
     core_grades_get_grades,

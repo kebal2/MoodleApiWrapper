@@ -38,6 +38,33 @@ namespace MoodleApiWrapper
                                     new DateTime(1970, 1, 1, 0, 0, 0, 0, System.DateTimeKind.Utc)).TotalSeconds);
         }
 
+        public Task<ApiResponse<Success>> DeleteCourses(int[] courseIds, CancellationToken cancellationToken = default)
+        {
+            if (HostIsSet && TokenIsSet)
+            {
+                string query = string.Empty;
+                query =
+                    "webservice/rest/server.php?" +
+                    $"wstoken={apiToken}&" +
+                    $"wsfunction={ParseMethod(Methods.core_course_delete_courses)}&" +
+                    $"moodlewsrestformat={ParseFormat(Format.JSON)}&";
+
+                for (int i = 0; i < courseIds.Length; i++)
+                    query += $"courseids[{i}]={courseIds[i]}&";
+
+                return Get<Success>(query.ToString(), cancellationToken);
+            }
+            else
+            {
+                if (!HostIsSet && TokenIsSet)
+                    throw new Exception("Host & token are not set");
+                else if (!HostIsSet)
+                    throw new Exception("Host is not set");
+                else
+                    throw new Exception("Token is not set");
+            }
+        }
+
         private string ParseFormat(Format format)
         {
             switch (format)
@@ -93,6 +120,8 @@ namespace MoodleApiWrapper
                     return "core_enrol_get_enrolled_users";
                 case Methods.core_course_create_courses:
                     return "core_course_create_courses";
+                case Methods.core_course_delete_courses:
+                    return Methods.core_course_delete_courses.ToString();
                 case Methods.core_course_update_courses:
                     return "core_course_update_courses";
                 case Methods.core_grades_get_grades:
@@ -1360,7 +1389,7 @@ namespace MoodleApiWrapper
         {
             try
             {
-                using var response = await client.GetAsync(Uri.EscapeDataString(uri), cancellationToken);
+                using var response = await client.GetAsync(uri, cancellationToken);
 
                 var responseStream = await response.Content.ReadAsStringAsync(cancellationToken);
 
@@ -1383,6 +1412,9 @@ namespace MoodleApiWrapper
         /// <returns></returns>
         private async Task<ApiResponse<T>> Get<T>(string uri, CancellationToken cancellationToken) where T : IDataModel
         {
+            if (uri.Length > 2000)
+                throw new Exception("URI is too long should be splitted into multiple queries");
+
             var response = await client.GetAsync(uri);
 
             if (!response.IsSuccessStatusCode) throw new WebException(await response.Content.ReadAsStringAsync(cancellationToken));
