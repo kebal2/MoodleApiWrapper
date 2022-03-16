@@ -1,13 +1,12 @@
-﻿using Newtonsoft.Json.Linq;
-
-using System;
-using System.IO;
+﻿using System;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+
+using Newtonsoft.Json.Linq;
 
 namespace MoodleApiWrapper
 {
@@ -139,7 +138,7 @@ namespace MoodleApiWrapper
                 $"&password={password}" +
                 $"&service={serviceHostName}";
 
-            return GetAuth<AuthToken>(host.AbsoluteUri + query, cancellationToken);
+            return GetAuth<AuthToken>(query.ToString(), cancellationToken);
         }
 
         /// <summary>
@@ -168,7 +167,7 @@ namespace MoodleApiWrapper
                         serviceHostName);
                 }
 
-                return Get<Site_info>(host.AbsoluteUri + query, cancellationToken);
+                return Get<Site_info>(query.ToString(), cancellationToken);
             }
             else
             {
@@ -229,7 +228,7 @@ namespace MoodleApiWrapper
                         $"criteria[0][value]={criteria_value0}";
                 }
 
-                return Get<Users>(host.AbsoluteUri + query, cancellationToken);
+                return Get<Users>(query.ToString(), cancellationToken);
             }
             else
             {
@@ -270,7 +269,7 @@ namespace MoodleApiWrapper
                     $"criteria[0][key]={criteria_key}&" +
                     $"criteria[0][value]={criteria_value}";
 
-                return Get<Users>(host.AbsoluteUri + query, cancellationToken);
+                return Get<Users>(query.ToString(), cancellationToken);
             }
 
             if (!HostIsSet && TokenIsSet)
@@ -298,7 +297,7 @@ namespace MoodleApiWrapper
                     $"moodlewsrestformat={ParseFormat(Format.JSON)}&" +
                     $"userid={userid}";
 
-                return Get<Cources>(host.AbsoluteUri + query, cancellationToken);
+                return Get<Cources>(query.ToString(), cancellationToken);
             }
             else
             {
@@ -380,7 +379,7 @@ namespace MoodleApiWrapper
                 if (customfields_value.Any()) querybuilder.Append($"&users[0][auth]={customfields_value}");
 
 
-                return Get<NewUser>(host.AbsoluteUri + querybuilder.ToString(), cancellationToken);
+                return Get<NewUser>(querybuilder.ToString(), cancellationToken);
             }
             else
             {
@@ -465,7 +464,7 @@ namespace MoodleApiWrapper
                 if (customfields_value.Any()) querybuilder.Append($"&users[0][auth]={customfields_value}");
 
 
-                return Get<Success>(host.AbsoluteUri + querybuilder.ToString(), cancellationToken);
+                return Get<Success>(querybuilder.ToString(), cancellationToken);
             }
             else
             {
@@ -495,7 +494,7 @@ namespace MoodleApiWrapper
                     $"moodlewsrestformat={ParseFormat(Format.JSON)}&" +
                     $"userids[0]={id}";
 
-                return Get<Success>(host.AbsoluteUri + query, cancellationToken);
+                return Get<Success>(query.ToString(), cancellationToken);
             }
             else
             {
@@ -536,7 +535,7 @@ namespace MoodleApiWrapper
                 if (context_level.Any()) query.Append($"&assignments[0][contextlevel]={context_level}");
                 if (instance_id != Int32.MinValue) query.Append($"&assignments[0][instanceid]={instance_id}");
 
-                return Get<Success>(host.AbsoluteUri + query, cancellationToken);
+                return Get<Success>(query.ToString(), cancellationToken);
             }
             else
             {
@@ -575,7 +574,7 @@ namespace MoodleApiWrapper
                 if (context_level.Any()) query.Append($"&unassignments[0][contextlevel]={context_level}");
                 if (instance_id != Int32.MinValue) query.Append($"&unassignments[0][instanceid]={instance_id}");
 
-                return Get<Success>(host.AbsoluteUri + query, cancellationToken);
+                return Get<Success>(query.ToString(), cancellationToken);
             }
             else
             {
@@ -616,7 +615,7 @@ namespace MoodleApiWrapper
                 if (timeend != Int32.MinValue) query.Append($"&enrolments[0][timeend]={timeend}");
                 if (suspend != Int32.MinValue) query.Append($"&enrolments[0][suspend]={suspend}");
 
-                return Get<Success>(host.AbsoluteUri + query, cancellationToken);
+                return Get<Success>(query.ToString(), cancellationToken);
             }
             else
             {
@@ -648,7 +647,7 @@ namespace MoodleApiWrapper
                     $"members[0][groupid]={group_id}&" +
                     $"members[0][userid]={user_id}");
 
-                return Get<Success>(host.AbsoluteUri + query, cancellationToken);
+                return Get<Success>(query.ToString(), cancellationToken);
             }
             else
             {
@@ -680,7 +679,7 @@ namespace MoodleApiWrapper
                     $"members[0][groupid]={group_id}&" +
                     $"members[0][userid]={user_id}");
 
-                return Get<Success>(host.AbsoluteUri + query, cancellationToken);
+                return Get<Success>(query.ToString(), cancellationToken);
             }
             else
             {
@@ -724,7 +723,7 @@ namespace MoodleApiWrapper
 
                 if (addSubCategories != 1) query.Append($"&addsubcategories={addSubCategories}");
 
-                return Get<Category>(host.AbsoluteUri + query, cancellationToken);
+                return Get<Category>(query.ToString(), cancellationToken);
             }
             else
             {
@@ -754,7 +753,7 @@ namespace MoodleApiWrapper
                     $"moodlewsrestformat={ParseFormat(Format.JSON)}");
                 if (options != int.MinValue) query.Append($"&addsubcategories={options}");
 
-                return Get<Course>(host.AbsoluteUri + query, cancellationToken);
+                return Get<Course>(query.ToString(), cancellationToken);
             }
 
             if (!HostIsSet && TokenIsSet)
@@ -783,7 +782,7 @@ namespace MoodleApiWrapper
                     $"moodlewsrestformat={ParseFormat(Format.JSON)}&" +
                     $"courseid={course_id}");
 
-                return Get<Content>(host.AbsoluteUri + query, cancellationToken);
+                return Get<Content>(query.ToString(), cancellationToken);
             }
             else
             {
@@ -813,7 +812,7 @@ namespace MoodleApiWrapper
                     $"moodlewsrestformat={ParseFormat(Format.JSON)}&" +
                     $"groupids[0]={group_id}");
 
-                return Get<Group>(host.AbsoluteUri + query, cancellationToken);
+                return Get<Group>(query.ToString(), cancellationToken);
             }
             else
             {
@@ -847,7 +846,7 @@ namespace MoodleApiWrapper
                     query.Append($"&groupids[{i}]={group_ids[i]}");
                 }
 
-                return Get<Group>(host.AbsoluteUri + query, cancellationToken);
+                return Get<Group>(query.ToString(), cancellationToken);
             }
             else
             {
@@ -877,7 +876,7 @@ namespace MoodleApiWrapper
                     $"moodlewsrestformat={ParseFormat(Format.JSON)}&" +
                     $"courseid={course_id}");
 
-                return Get<Group>(host.AbsoluteUri + query, cancellationToken);
+                return Get<Group>(query.ToString(), cancellationToken);
             }
             else
             {
@@ -907,7 +906,7 @@ namespace MoodleApiWrapper
                     $"moodlewsrestformat={ParseFormat(Format.JSON)}&" +
                     $"courseid={course_id}");
 
-                return Get<EnrolledUser>(host.AbsoluteUri + query, cancellationToken);
+                return Get<EnrolledUser>(query.ToString(), cancellationToken);
             }
             else
             {
@@ -982,14 +981,14 @@ namespace MoodleApiWrapper
                 if (course.lang.Any()) query.Append($"&courses[0][lang]={course.lang}");
                 if (course.forcetheme.Any()) query.Append($"&courses[0][forcetheme]={course.forcetheme}");
 
-                return Get<NewCourse>(host.AbsoluteUri + query, cancellationToken);
+                return Get<NewCourse>(query.ToString(), cancellationToken);
             }
 
             if (!HostIsSet && TokenIsSet)
                 throw new Exception("Host & token are not set");
             if (!HostIsSet)
                 throw new Exception("Host is not set");
-                
+
             throw new Exception("Token is not set");
         }
 
@@ -1014,13 +1013,13 @@ namespace MoodleApiWrapper
                 for (var i = 0; i < courses.Length; i++)
                 {
                     var course = courses[i];
-                    
+
                     query.Append($"&courses[{i}][{nameof(course.Fullname).ToLower()}]={course.Fullname}");
                     query.Append($"&courses[{i}][{nameof(course.Shortname).ToLower()}]={course.Shortname}");
                     query.Append($"&courses[{i}][{nameof(course.CategoryId).ToLower()}]={course.CategoryId}");
                 }
 
-                return Get<NewCourse>(host.AbsoluteUri + query, cancellationToken);
+                return Get<NewCourse>(query.ToString(), cancellationToken);
             }
 
             if (!HostIsSet && TokenIsSet)
@@ -1072,7 +1071,7 @@ namespace MoodleApiWrapper
                 if (lang.Any()) query.Append($"&courses[0][lang]={lang}");
                 if (forcetheme.Any()) query.Append($"&courses[0][forcetheme]={forcetheme}");
 
-                return Get<UpdateCourseRoot>(host.AbsoluteUri + query, cancellationToken);
+                return Get<UpdateCourseRoot>(query.ToString(), cancellationToken);
             }
             else
             {
@@ -1109,7 +1108,7 @@ namespace MoodleApiWrapper
                 if (userids != null) query.Append($"&userids={userids}");
                 if (component.Any()) query.Append($"&component={component}");
 
-                return Get<Category>(host.AbsoluteUri + query, cancellationToken);
+                return Get<Category>(query.ToString(), cancellationToken);
             }
             else
             {
@@ -1152,7 +1151,7 @@ namespace MoodleApiWrapper
                     for (int i = 0; i < eventids.Count(); i++)
                         query.Append($"&events[eventids][{i}]={eventids[i]}");
 
-                return Get<Events>(host.AbsoluteUri + query, cancellationToken);
+                return Get<Events>(query.ToString(), cancellationToken);
             }
             else
             {
@@ -1233,7 +1232,7 @@ namespace MoodleApiWrapper
                     for (int i = 0; i < sequences.Count(); i++)
                         query.Append($"&events[{i}][sequence]={sequences[i]}");
 
-                return Get<Events>(host.AbsoluteUri + query, cancellationToken);
+                return Get<Events>(query.ToString(), cancellationToken);
             }
             else
             {
@@ -1277,7 +1276,7 @@ namespace MoodleApiWrapper
                     for (int i = 0; i < descriptions.Count(); i++)
                         query.Append($"&events[{i}][description]={descriptions[i]}");
 
-                return Get<Events>(host.AbsoluteUri + query, cancellationToken);
+                return Get<Events>(query.ToString(), cancellationToken);
             }
             else
             {
@@ -1337,7 +1336,7 @@ namespace MoodleApiWrapper
                         query.Append($"&groups[{i}][idnumber]={idnumbers[i]}");
 
 
-                return Get<Events>(host.AbsoluteUri + query, cancellationToken);
+                return Get<Events>(query.ToString(), cancellationToken);
             }
             else
             {
@@ -1384,7 +1383,7 @@ namespace MoodleApiWrapper
         /// <returns></returns>
         private async Task<ApiResponse<T>> Get<T>(string uri, CancellationToken cancellationToken) where T : IDataModel
         {
-            var response = await client.GetAsync(Uri.EscapeDataString(uri));
+            var response = await client.GetAsync(uri);
 
             if (!response.IsSuccessStatusCode) throw new WebException(await response.Content.ReadAsStringAsync(cancellationToken));
 
