@@ -18,9 +18,10 @@ namespace MoodleApiWrapper
 
         public ApiWrapper(Uri host)
         {
-            client = new HttpClient();
-
-            client.BaseAddress = host;
+            client = new HttpClient
+            {
+                BaseAddress = host
+            };
         }
 
         public ApiWrapper(Uri host, string apiToken) : this(host)
@@ -32,7 +33,7 @@ namespace MoodleApiWrapper
         private bool TokenIsSet => apiToken.Any();
         private bool HostIsSet => host.AbsoluteUri.Any();
 
-        private int DateTimeToUnixTimestamp(DateTime dateTime)
+        private static int DateTimeToUnixTimestamp(DateTime dateTime)
         {
             return Convert.ToInt32((TimeZoneInfo.ConvertTimeToUtc(dateTime) -
                                     new DateTime(1970, 1, 1, 0, 0, 0, 0, System.DateTimeKind.Utc)).TotalSeconds);
@@ -42,8 +43,7 @@ namespace MoodleApiWrapper
         {
             if (HostIsSet && TokenIsSet)
             {
-                string query = string.Empty;
-                query =
+                string query =
                     "webservice/rest/server.php?" +
                     $"wstoken={apiToken}&" +
                     $"wsfunction={Methods.core_course_delete_courses}&" +
@@ -103,7 +103,7 @@ namespace MoodleApiWrapper
         {
             if (HostIsSet && TokenIsSet)
             {
-                var query = string.Empty;
+                string query;
                 if (!serviceHostName.Any())
                 {
                     query = string.Format("webservice/rest/server.php" +
@@ -155,7 +155,7 @@ namespace MoodleApiWrapper
         {
             if (HostIsSet && TokenIsSet)
             {
-                string query = string.Empty;
+                string query;
                 if (criteria_key1.Any() && criteria_value1.Any())
                 {
                     query =
@@ -211,8 +211,7 @@ namespace MoodleApiWrapper
         {
             if (HostIsSet && TokenIsSet)
             {
-                string query = string.Empty;
-                query =
+                string query =
                     "webservice/rest/server.php?" +
                     $"wstoken={apiToken}&" +
                     $"wsfunction={Methods.core_user_get_users_by_field}&" +
@@ -240,8 +239,7 @@ namespace MoodleApiWrapper
         {
             if (HostIsSet && TokenIsSet)
             {
-                string query = string.Empty;
-                query =
+                string query =
                     "webservice/rest/server.php?" +
                     $"wstoken={apiToken}&" +
                     $"wsfunction={Methods.core_enrol_get_users_courses}&" +
@@ -300,7 +298,7 @@ namespace MoodleApiWrapper
         {
             if (HostIsSet && TokenIsSet)
             {
-                StringBuilder querybuilder = new StringBuilder();
+                StringBuilder querybuilder = new();
                 querybuilder.Append(
                     "webservice/rest/server.php?" +
                     $"wstoken={apiToken}&wsfunction={Methods.core_user_create_users}&" +
@@ -383,7 +381,7 @@ namespace MoodleApiWrapper
         {
             if (HostIsSet && TokenIsSet)
             {
-                StringBuilder querybuilder = new StringBuilder();
+                StringBuilder querybuilder = new();
                 querybuilder.Append(
                     "webservice/rest/server.php?" +
                     $"wstoken={apiToken}&wsfunction={Methods.core_user_update_users}&" +
@@ -437,8 +435,7 @@ namespace MoodleApiWrapper
         {
             if (HostIsSet && TokenIsSet)
             {
-                string query = string.Empty;
-                query =
+                string query =
                     "webservice/rest/server.php?" +
                     $"wstoken={apiToken}&" +
                     $"wsfunction={Methods.core_user_delete_users}&" +
@@ -474,7 +471,7 @@ namespace MoodleApiWrapper
         {
             if (HostIsSet && TokenIsSet)
             {
-                StringBuilder query = new StringBuilder();
+                StringBuilder query = new();
                 query.Append(
                     "webservice/rest/server.php?" +
                     $"wstoken={apiToken}&" +
@@ -513,7 +510,7 @@ namespace MoodleApiWrapper
         {
             if (HostIsSet && TokenIsSet)
             {
-                StringBuilder query = new StringBuilder();
+                StringBuilder query = new();
                 query.Append(
                     "webservice/rest/server.php?" +
                     $"wstoken={apiToken}&" +
@@ -553,7 +550,7 @@ namespace MoodleApiWrapper
         {
             if (HostIsSet && TokenIsSet)
             {
-                StringBuilder query = new StringBuilder();
+                StringBuilder query = new();
                 query.Append(
                     "webservice/rest/server.php?" +
                     $"wstoken={apiToken}&" +
@@ -589,7 +586,7 @@ namespace MoodleApiWrapper
         {
             if (HostIsSet && TokenIsSet)
             {
-                StringBuilder query = new StringBuilder();
+                StringBuilder query = new();
                 query.Append(
                     "webservice/rest/server.php?" +
                     $"wstoken={apiToken}&" +
@@ -621,7 +618,7 @@ namespace MoodleApiWrapper
         {
             if (HostIsSet && TokenIsSet)
             {
-                StringBuilder query = new StringBuilder();
+                StringBuilder query = new();
                 query.Append(
                     "webservice/rest/server.php?" +
                     $"wstoken={apiToken}&" +
@@ -663,7 +660,7 @@ namespace MoodleApiWrapper
         {
             if (HostIsSet && TokenIsSet)
             {
-                StringBuilder query = new StringBuilder();
+                StringBuilder query = new();
                 query.Append(
                     "webservice/rest/server.php?" +
                     $"wstoken={apiToken}&" +
@@ -696,7 +693,7 @@ namespace MoodleApiWrapper
         {
             if (HostIsSet && TokenIsSet)
             {
-                StringBuilder query = new StringBuilder();
+                StringBuilder query = new();
                 query.Append(
                     "webservice/rest/server.php?" +
                     $"wstoken={apiToken}&" +
@@ -725,7 +722,7 @@ namespace MoodleApiWrapper
         {
             if (HostIsSet && TokenIsSet)
             {
-                StringBuilder query = new StringBuilder();
+                StringBuilder query = new();
                 query.Append(
                     "webservice/rest/server.php?" +
                     $"wstoken={apiToken}&" +
@@ -755,7 +752,7 @@ namespace MoodleApiWrapper
         {
             if (HostIsSet && TokenIsSet)
             {
-                StringBuilder query = new StringBuilder();
+                StringBuilder query = new();
                 query.Append(
                     "webservice/rest/server.php?" +
                     $"wstoken={apiToken}&" +
@@ -785,14 +782,14 @@ namespace MoodleApiWrapper
         {
             if (HostIsSet && TokenIsSet)
             {
-                StringBuilder query = new StringBuilder();
+                StringBuilder query = new();
                 query.Append(
                     "webservice/rest/server.php?" +
                     $"wstoken={apiToken}&" +
                     $"wsfunction={Methods.core_group_get_groups}&" +
                     $"moodlewsrestformat={Format.json}");
 
-                for (int i = 0; i < group_ids.Count(); i++)
+                for (int i = 0; i < group_ids.Length; i++)
                 {
                     query.Append($"&groupids[{i}]={group_ids[i]}");
                 }
@@ -819,7 +816,7 @@ namespace MoodleApiWrapper
         {
             if (HostIsSet && TokenIsSet)
             {
-                StringBuilder query = new StringBuilder();
+                StringBuilder query = new();
                 query.Append(
                     "webservice/rest/server.php?" +
                     $"wstoken={apiToken}&" +
@@ -849,7 +846,7 @@ namespace MoodleApiWrapper
         {
             if (HostIsSet && TokenIsSet)
             {
-                StringBuilder query = new StringBuilder();
+                StringBuilder query = new();
                 query.Append(
                     "webservice/rest/server.php?" +
                     $"wstoken={apiToken}&" +
@@ -902,7 +899,7 @@ namespace MoodleApiWrapper
         {
             if (HostIsSet && TokenIsSet)
             {
-                StringBuilder query = new StringBuilder();
+                StringBuilder query = new();
                 query.Append(
                     "webservice/rest/server.php?" +
                     $"wstoken={apiToken}&" +
@@ -917,7 +914,7 @@ namespace MoodleApiWrapper
                 if (course.summaryformat != 1) query.Append($"&courses[0][summaryformat ]={course.summaryformat}");
                 if (course.format.Any()) query.Append($"&courses[0][format]={course.format}");
                 if (course.showgrades != 0) query.Append($"&courses[0][showgrades]={course.showgrades}");
-                if (!course.startdate.Equals(default(DateTime))) query.Append($"&courses[0][startdate]={DateTimeToUnixTimestamp(course.startdate)}");
+                if (!course.startdate.Equals(default)) query.Append($"&courses[0][startdate]={DateTimeToUnixTimestamp(course.startdate)}");
                 if (course.newsitems != 0) query.Append($"&courses[0][newsitems]={course.newsitems}");
                 if (course.numsections != int.MaxValue) query.Append($"&courses[0][numsections]={course.numsections}");
                 if (course.maxbytes != 104857600) query.Append($"&courses[0][maxbytes]={course.CategoryId}");
@@ -954,7 +951,7 @@ namespace MoodleApiWrapper
         {
             if (HostIsSet && TokenIsSet)
             {
-                StringBuilder query = new StringBuilder();
+                StringBuilder query = new();
                 query.Append(
                     "webservice/rest/server.php?" +
                     $"wstoken={apiToken}&" +
@@ -983,7 +980,7 @@ namespace MoodleApiWrapper
 
         public Task<ApiResponse<UpdateCourseRoot>> UpdateCourse(int id, string fullname = "", string shortname = "", int category_id = Int32.MaxValue,
             string idnumber = "", string summary = "", int summaryformat = 1, string format = "", int showgrades = 0, int newsitems = 0,
-            DateTime startdate = default(DateTime), int numsections = int.MaxValue, int maxbytes = 104857600, int showreports = 1,
+            DateTime startdate = default, int numsections = int.MaxValue, int maxbytes = 104857600, int showreports = 1,
             int visible = 0, int hiddensections = int.MaxValue, int groupmode = 0,
             int groupmodeforce = 0, int defaultgroupingid = 0, int enablecompletion = int.MaxValue,
             int completenotify = 0, string lang = "", string forcetheme = "",
@@ -991,7 +988,7 @@ namespace MoodleApiWrapper
         {
             if (HostIsSet && TokenIsSet)
             {
-                StringBuilder query = new StringBuilder();
+                StringBuilder query = new();
                 query.Append(
                     "webservice/rest/server.php?" +
                     $"wstoken={apiToken}&" +
@@ -1007,7 +1004,7 @@ namespace MoodleApiWrapper
                 if (summaryformat != 1) query.Append($"&courses[0][summaryformat ]={summaryformat}");
                 if (format.Any()) query.Append($"&courses[0][format]={format}");
                 if (showgrades != 0) query.Append($"&courses[0][showgrades]={showgrades}");
-                if (!startdate.Equals(default(DateTime))) query.Append($"&courses[0][startdate]={DateTimeToUnixTimestamp(startdate)}");
+                if (!startdate.Equals(default)) query.Append($"&courses[0][startdate]={DateTimeToUnixTimestamp(startdate)}");
                 if (newsitems != 0) query.Append($"&courses[0][newsitems]={newsitems}");
                 if (numsections != int.MaxValue) query.Append($"&courses[0][numsections]={numsections}");
                 if (maxbytes != 104857600) query.Append($"&courses[0][maxbytes]={category_id}");
@@ -1046,7 +1043,7 @@ namespace MoodleApiWrapper
         {
             if (HostIsSet && TokenIsSet)
             {
-                StringBuilder query = new StringBuilder();
+                StringBuilder query = new();
                 query.Append(
                     "webservice/rest/server.php?" +
                     $"wstoken={apiToken}&" +
@@ -1079,11 +1076,11 @@ namespace MoodleApiWrapper
         /// <param name="courseids"></param>
         /// <param name="eventids"></param>
         /// <returns></returns>
-        public Task<ApiResponse<Events>> GetCalanderEvents(int[] groupids = default(int[]), int[] courseids = default(int[]), int[] eventids = default(int[]), CancellationToken cancellationToken = default)
+        public Task<ApiResponse<Events>> GetCalanderEvents(int[] groupids = default, int[] courseids = default, int[] eventids = default, CancellationToken cancellationToken = default)
         {
             if (HostIsSet && TokenIsSet)
             {
-                StringBuilder query = new StringBuilder();
+                StringBuilder query = new();
                 query.Append(
                     "webservice/rest/server.php?" +
                     $"wstoken={apiToken}&" +
@@ -1091,15 +1088,15 @@ namespace MoodleApiWrapper
                     $"moodlewsrestformat={Format.json}");
 
                 if (groupids != null)
-                    for (int i = 0; i < groupids.Count(); i++)
+                    for (int i = 0; i < groupids.Length; i++)
                         query.Append($"&events[groupids][{i}]={groupids[i]}");
 
                 if (courseids != null)
-                    for (int i = 0; i < courseids.Count(); i++)
+                    for (int i = 0; i < courseids.Length; i++)
                         query.Append($"&events[courseids][{i}]={courseids[i]}");
 
                 if (eventids != null)
-                    for (int i = 0; i < eventids.Count(); i++)
+                    for (int i = 0; i < eventids.Length; i++)
                         query.Append($"&events[eventids][{i}]={eventids[i]}");
 
                 return Get<Events>(query.ToString(), cancellationToken);
@@ -1130,57 +1127,57 @@ namespace MoodleApiWrapper
         /// <param name="visible"></param>
         /// <param name="sequences"></param>
         /// <returns></returns>
-        public Task<ApiResponse<Events>> CreateCalanderEvents(string[] names, string[] descriptions = default(string[]),
-            int[] formats = default(int[]), int[] groupids = default(int[]), int[] courseids = default(int[]), int[] repeats = default(int[]),
-            string[] eventtypes = default(string[]), DateTime[] timestarts = default(DateTime[]), TimeSpan[] timedurations = default(TimeSpan[]),
-            int[] visible = default(int[]), int[] sequences = default(int[]), CancellationToken cancellationToken = default)
+        public Task<ApiResponse<Events>> CreateCalanderEvents(string[] names, string[] descriptions = default,
+            int[] formats = default, int[] groupids = default, int[] courseids = default, int[] repeats = default,
+            string[] eventtypes = default, DateTime[] timestarts = default, TimeSpan[] timedurations = default,
+            int[] visible = default, int[] sequences = default, CancellationToken cancellationToken = default)
         {
             if (HostIsSet && TokenIsSet)
             {
-                StringBuilder query = new StringBuilder();
+                StringBuilder query = new();
                 query.Append(
                     "webservice/rest/server.php?" +
                     $"wstoken={apiToken}&" +
                     $"wsfunction={Methods.core_calendar_create_calendar_events}&" +
                     $"moodlewsrestformat={Format.json}");
 
-                for (int i = 0; i < names.Count(); i++)
+                for (int i = 0; i < names.Length; i++)
                     query.Append($"&events[{i}][name]={names[i]}");
 
                 if (groupids != null)
-                    for (int i = 0; i < groupids.Count(); i++)
+                    for (int i = 0; i < groupids.Length; i++)
                         query.Append($"&events[{i}][groupid]={groupids[i]}");
 
                 if (courseids != null)
-                    for (int i = 0; i < courseids.Count(); i++)
+                    for (int i = 0; i < courseids.Length; i++)
                         query.Append($"&events[{i}][courseid]={courseids[i]}");
 
                 if (descriptions != null)
-                    for (int i = 0; i < descriptions.Count(); i++)
+                    for (int i = 0; i < descriptions.Length; i++)
                         query.Append($"&events[{i}][description]={descriptions[i]}");
 
                 if (formats != null)
-                    for (int i = 0; i < formats.Count(); i++)
+                    for (int i = 0; i < formats.Length; i++)
                         query.Append($"&events[{i}][format]={formats[i]}");
 
                 if (repeats != null)
-                    for (int i = 0; i < repeats.Count(); i++)
+                    for (int i = 0; i < repeats.Length; i++)
                         query.Append($"&events[{i}][repeats]={repeats[i]}");
 
                 if (timestarts != null)
-                    for (int i = 0; i < timestarts.Count(); i++)
+                    for (int i = 0; i < timestarts.Length; i++)
                         query.Append($"&events[{i}][timestart]={DateTimeToUnixTimestamp(timestarts[i])}");
 
                 if (timedurations != null)
-                    for (int i = 0; i < timedurations.Count(); i++)
+                    for (int i = 0; i < timedurations.Length; i++)
                         query.Append($"&events[{i}][timeduration]={timedurations[i].TotalSeconds}");
 
                 if (visible != null)
-                    for (int i = 0; i < visible.Count(); i++)
+                    for (int i = 0; i < visible.Length; i++)
                         query.Append($"&events[{i}][visible]={visible[i]}");
 
                 if (sequences != null)
-                    for (int i = 0; i < sequences.Count(); i++)
+                    for (int i = 0; i < sequences.Length; i++)
                         query.Append($"&events[{i}][sequence]={sequences[i]}");
 
                 return Get<Events>(query.ToString(), cancellationToken);
@@ -1203,11 +1200,11 @@ namespace MoodleApiWrapper
         /// <param name="repeats"></param>
         /// <param name="descriptions"></param>
         /// <returns></returns>
-        public Task<ApiResponse<Events>> DeleteCalanderEvents(int[] eventids, int[] repeats, string[] descriptions = default(string[]), CancellationToken cancellationToken = default)
+        public Task<ApiResponse<Events>> DeleteCalanderEvents(int[] eventids, int[] repeats, string[] descriptions = default, CancellationToken cancellationToken = default)
         {
             if (HostIsSet && TokenIsSet)
             {
-                StringBuilder query = new StringBuilder();
+                StringBuilder query = new();
                 query.Append(
                     "webservice/rest/server.php?" +
                     $"wstoken={apiToken}&" +
@@ -1215,16 +1212,16 @@ namespace MoodleApiWrapper
                     $"moodlewsrestformat={Format.json}");
 
                 if (repeats != null)
-                    for (int i = 0; i < repeats.Count(); i++)
+                    for (int i = 0; i < repeats.Length; i++)
                         query.Append($"&events[{i}][repeat]={repeats[i]}");
 
                 if (eventids != null)
-                    for (int i = 0; i < eventids.Count(); i++)
+                    for (int i = 0; i < eventids.Length; i++)
                         query.Append($"&events[{i}][eventid]={eventids[i]}");
 
 
                 if (descriptions != null)
-                    for (int i = 0; i < descriptions.Count(); i++)
+                    for (int i = 0; i < descriptions.Length; i++)
                         query.Append($"&events[{i}][description]={descriptions[i]}");
 
                 return Get<Events>(query.ToString(), cancellationToken);
@@ -1250,12 +1247,12 @@ namespace MoodleApiWrapper
         /// <param name="enrolmentkeys"></param>
         /// <param name="idnumbers"></param>
         /// <returns></returns>
-        public Task<ApiResponse<Events>> CreateGroups(string[] names = default(string[]), int[] courseids = default(int[]), string[] descriptions = default(string[]),
-            int[] descriptionformats = default(int[]), string[] enrolmentkeys = default(string[]), string[] idnumbers = default(string[]), CancellationToken cancellationToken = default)
+        public Task<ApiResponse<Events>> CreateGroups(string[] names = default, int[] courseids = default, string[] descriptions = default,
+            int[] descriptionformats = default, string[] enrolmentkeys = default, string[] idnumbers = default, CancellationToken cancellationToken = default)
         {
             if (HostIsSet && TokenIsSet)
             {
-                StringBuilder query = new StringBuilder();
+                StringBuilder query = new();
                 query.Append(
                     "webservice/rest/server.php?" +
                     $"wstoken={apiToken}&" +
@@ -1263,27 +1260,27 @@ namespace MoodleApiWrapper
                     $"moodlewsrestformat={Format.json}");
 
                 if (names != null)
-                    for (int i = 0; i < names.Count(); i++)
+                    for (int i = 0; i < names.Length; i++)
                         query.Append($"&groups[{i}][name]={names[i]}");
 
                 if (courseids != null)
-                    for (int i = 0; i < courseids.Count(); i++)
+                    for (int i = 0; i < courseids.Length; i++)
                         query.Append($"&groups[{i}][courseid]={courseids[i]}");
 
                 if (descriptions != null)
-                    for (int i = 0; i < descriptions.Count(); i++)
+                    for (int i = 0; i < descriptions.Length; i++)
                         query.Append($"&groups[{i}][description]={descriptions[i]}");
 
                 if (descriptionformats != null)
-                    for (int i = 0; i < descriptionformats.Count(); i++)
+                    for (int i = 0; i < descriptionformats.Length; i++)
                         query.Append($"&groups[{i}][descriptionformat]={descriptionformats[i]}");
 
                 if (enrolmentkeys != null)
-                    for (int i = 0; i < enrolmentkeys.Count(); i++)
+                    for (int i = 0; i < enrolmentkeys.Length; i++)
                         query.Append($"&groups[{i}][enrolmentkey]={enrolmentkeys[i]}");
 
                 if (idnumbers != null)
-                    for (int i = 0; i < idnumbers.Count(); i++)
+                    for (int i = 0; i < idnumbers.Length; i++)
                         query.Append($"&groups[{i}][idnumber]={idnumbers[i]}");
 
 
@@ -1337,7 +1334,7 @@ namespace MoodleApiWrapper
             if (uri.Length > 2000)
                 throw new Exception("URI is too long should be splitted into multiple queries");
 
-            var response = await client.GetAsync(uri);
+            var response = await client.GetAsync(uri, cancellationToken);
 
             if (!response.IsSuccessStatusCode) throw new WebException(await response.Content.ReadAsStringAsync(cancellationToken));
 
@@ -1360,6 +1357,7 @@ namespace MoodleApiWrapper
 
         public void Dispose()
         {
+            GC.SuppressFinalize(this);
             client?.Dispose();
         }
     }
