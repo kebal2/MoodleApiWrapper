@@ -28,7 +28,7 @@ namespace MoodleApiWrapper
 
             if (!HostIsSet && TokenIsSet)
                 throw new Exception("Host & token are not set");
-            else if (!HostIsSet)
+            if (!HostIsSet)
                 throw new Exception("Host is not set");
             else
                 throw new Exception("Token is not set");
@@ -45,13 +45,12 @@ namespace MoodleApiWrapper
 
         public Task<ApiResponse<Success>> DeleteCourses(int[] courseIds, CancellationToken cancellationToken = default)
         {
-            StringBuilder query = new();
-            query.Append(GetDefaultQuery(Methods.core_course_delete_courses));
+            StringBuilder query = GetDefaultQuery(Methods.core_course_delete_courses);
 
             for (int i = 0; i < courseIds.Length; i++)
                 query.Append($"&courseids[{i}]={courseIds[i]}");
 
-            return Get<Success>(query.ToString(), cancellationToken);
+            return Get<Success>(query, cancellationToken);
         }
 
         /// <summary>
@@ -76,7 +75,7 @@ namespace MoodleApiWrapper
                 $"&password={password}" +
                 $"&service={serviceHostName}";
 
-            return GetAuth<AuthToken>(query.ToString(), cancellationToken);
+            return GetAuth<AuthToken>(query, cancellationToken);
         }
 
         /// <summary>
@@ -88,20 +87,12 @@ namespace MoodleApiWrapper
         /// <returns></returns>
         public Task<ApiResponse<Site_info>> GetSiteInfo(string serviceHostName = "", CancellationToken cancellationToken = default)
         {
-            StringBuilder query = new();
+            StringBuilder query = GetDefaultQuery(Methods.core_webservice_get_site_info);
 
-            //string query;
-            if (!serviceHostName.Any())
-            {
-                query.Append(GetDefaultQuery(Methods.core_webservice_get_site_info));
-            }
-            else
-            {
-                query.Append(GetDefaultQuery(Methods.core_webservice_get_site_info));
+            if (serviceHostName.Any())
                 query.Append($"&serviceshortnames[0]={serviceHostName}");
-            }
 
-            return Get<Site_info>(query.ToString(), cancellationToken);
+            return Get<Site_info>(query, cancellationToken);
         }
 
         /// <summary>
@@ -126,8 +117,7 @@ namespace MoodleApiWrapper
         /// <returns></returns>
         public Task<ApiResponse<Users>> GetUsers(string criteria_key0, string criteria_value0, string criteria_key1 = "", string criteria_value1 = "", CancellationToken cancellationToken = default)
         {
-            StringBuilder query = new();
-            query.Append(GetDefaultQuery(Methods.core_user_get_users));
+            StringBuilder query = GetDefaultQuery(Methods.core_user_get_users);
             if (criteria_key1.Any() && criteria_value1.Any())
             {
                 query.Append(
@@ -143,7 +133,7 @@ namespace MoodleApiWrapper
                     $"&criteria[0][value]={criteria_value0}");
             }
 
-            return Get<Users>(query.ToString(), cancellationToken);
+            return Get<Users>(query, cancellationToken);
         }
 
         /// <summary>
@@ -163,13 +153,12 @@ namespace MoodleApiWrapper
         /// <returns></returns>
         public Task<ApiResponse<Users>> GetUsersByField(string criteria_key, string criteria_value, CancellationToken cancellationToken = default)
         {
-            StringBuilder query = new();
-            query.Append(GetDefaultQuery(Methods.core_user_get_users_by_field));
+            StringBuilder query = GetDefaultQuery(Methods.core_user_get_users_by_field);
             query.Append(
                 $"&criteria[0][key]={criteria_key}" +
                 $"&criteria[0][value]={criteria_value}");
 
-            return Get<Users>(query.ToString(), cancellationToken);
+            return Get<Users>(query, cancellationToken);
         }
 
         /// <summary>
@@ -179,11 +168,10 @@ namespace MoodleApiWrapper
         /// <returns></returns>
         public Task<ApiResponse<Cources>> GetUserCourses(int userid, CancellationToken cancellationToken = default)
         {
-            StringBuilder query = new();
-            query.Append(GetDefaultQuery(Methods.core_enrol_get_users_courses));
+            StringBuilder query = GetDefaultQuery(Methods.core_enrol_get_users_courses);
             query.Append($"&userid={userid}");
 
-            return Get<Cources>(query.ToString(), cancellationToken);
+            return Get<Cources>(query, cancellationToken);
         }
 
         /// <summary>
@@ -223,8 +211,7 @@ namespace MoodleApiWrapper
             string preferences_type = "", string preferences_value = "",
             string customfields_type = "", string customfields_value = "", CancellationToken cancellationToken = default)
         {
-            StringBuilder query = new();
-            query.Append(GetDefaultQuery(Methods.core_user_create_users));
+            StringBuilder query = GetDefaultQuery(Methods.core_user_create_users);
             query.Append(
                 $"&users[0][username]={@username}" +
                 $"&users[0][password]={@password}" +
@@ -250,7 +237,7 @@ namespace MoodleApiWrapper
             if (customfields_type.Any()) query.Append($"&users[0][auth]={customfields_type}");
             if (customfields_value.Any()) query.Append($"&users[0][auth]={customfields_value}");
 
-            return Get<NewUser>(query.ToString(), cancellationToken);
+            return Get<NewUser>(query, cancellationToken);
         }
 
         /// <summary>
@@ -291,8 +278,7 @@ namespace MoodleApiWrapper
             string preferences_type = "", string preferences_value = "",
             string customfields_type = "", string customfields_value = "", CancellationToken cancellationToken = default)
         {
-            StringBuilder query = new();
-            query.Append(GetDefaultQuery(Methods.core_user_update_users));
+            StringBuilder query = GetDefaultQuery(Methods.core_user_update_users);
             query.Append($"&users[0][id]={id}");
 
             if (username.Any()) query.Append($"&users[0][username]={username}");
@@ -320,7 +306,7 @@ namespace MoodleApiWrapper
             if (customfields_value.Any()) query.Append($"&users[0][auth]={customfields_value}");
 
 
-            return Get<Success>(query.ToString(), cancellationToken);
+            return Get<Success>(query, cancellationToken);
         }
 
         /// <summary>
@@ -330,11 +316,10 @@ namespace MoodleApiWrapper
         /// <returns></returns>
         public Task<ApiResponse<Success>> DeleteUser(int id, CancellationToken cancellationToken = default)
         {
-            StringBuilder query = new();
-            query.Append(GetDefaultQuery(Methods.core_user_delete_users));
+            StringBuilder query = GetDefaultQuery(Methods.core_user_delete_users);
             query.Append($"&userids[0]={id}");
 
-            return Get<Success>(query.ToString(), cancellationToken);
+            return Get<Success>(query, cancellationToken);
         }
 
         /// <summary>
@@ -351,8 +336,7 @@ namespace MoodleApiWrapper
         public Task<ApiResponse<Success>> AssignRoles(int role_id, int user_id, string context_id = "",
             string context_level = "", int instance_id = Int32.MinValue, CancellationToken cancellationToken = default)
         {
-            StringBuilder query = new();
-            query.Append(GetDefaultQuery(Methods.core_role_assign_roles));
+            StringBuilder query = GetDefaultQuery(Methods.core_role_assign_roles);
             query.Append(
                 $"&assignments[0][roleid]={role_id}" +
                 $"&assignments[0][userid]={user_id}");
@@ -360,7 +344,7 @@ namespace MoodleApiWrapper
             if (context_level.Any()) query.Append($"&assignments[0][contextlevel]={context_level}");
             if (instance_id != Int32.MinValue) query.Append($"&assignments[0][instanceid]={instance_id}");
 
-            return Get<Success>(query.ToString(), cancellationToken);
+            return Get<Success>(query, cancellationToken);
         }
 
         /// <summary>
@@ -375,8 +359,7 @@ namespace MoodleApiWrapper
         public Task<ApiResponse<Success>> UnassignRoles(int role_id, int user_id, string context_id = "",
             string context_level = "", int instance_id = Int32.MinValue, CancellationToken cancellationToken = default)
         {
-            StringBuilder query = new();
-            query.Append(GetDefaultQuery(Methods.core_role_unassign_roles));
+            StringBuilder query = GetDefaultQuery(Methods.core_role_unassign_roles);
             query.Append(
                 $"&unassignments[0][roleid]={role_id}" +
                 $"&unassignments[0][userid]={user_id}");
@@ -384,7 +367,7 @@ namespace MoodleApiWrapper
             if (context_level.Any()) query.Append($"&unassignments[0][contextlevel]={context_level}");
             if (instance_id != Int32.MinValue) query.Append($"&unassignments[0][instanceid]={instance_id}");
 
-            return Get<Success>(query.ToString(), cancellationToken);
+            return Get<Success>(query, cancellationToken);
         }
 
         /// <summary>
@@ -400,8 +383,7 @@ namespace MoodleApiWrapper
         public Task<ApiResponse<Success>> EnrolUser(int role_id, int user_id, int cource_id,
             int timestart = Int32.MinValue, int timeend = Int32.MinValue, int suspend = Int32.MinValue, CancellationToken cancellationToken = default)
         {
-            StringBuilder query = new();
-            query.Append(GetDefaultQuery(Methods.enrol_manual_enrol_users));
+            StringBuilder query = GetDefaultQuery(Methods.enrol_manual_enrol_users);
             query.Append(
                 $"&enrolments[0][roleid]={role_id}" +
                 $"&enrolments[0][userid]={user_id}" +
@@ -410,7 +392,7 @@ namespace MoodleApiWrapper
             if (timeend != Int32.MinValue) query.Append($"&enrolments[0][timeend]={timeend}");
             if (suspend != Int32.MinValue) query.Append($"&enrolments[0][suspend]={suspend}");
 
-            return Get<Success>(query.ToString(), cancellationToken);
+            return Get<Success>(query, cancellationToken);
         }
 
         /// <summary>
@@ -421,13 +403,12 @@ namespace MoodleApiWrapper
         /// <returns></returns>
         public Task<ApiResponse<Success>> AddGroupMember(int group_id, int user_id, CancellationToken cancellationToken = default)
         {
-            StringBuilder query = new();
-            query.Append(GetDefaultQuery(Methods.core_group_add_group_members));
+            StringBuilder query = GetDefaultQuery(Methods.core_group_add_group_members);
             query.Append(
                 $"&members[0][groupid]={group_id}" +
                 $"&members[0][userid]={user_id}");
 
-            return Get<Success>(query.ToString(), cancellationToken);
+            return Get<Success>(query, cancellationToken);
         }
 
         /// <summary>
@@ -438,13 +419,12 @@ namespace MoodleApiWrapper
         /// <returns></returns>
         public Task<ApiResponse<Success>> DeleteGroupMember(int group_id, int user_id, CancellationToken cancellationToken = default)
         {
-            StringBuilder query = new();
-            query.Append(GetDefaultQuery(Methods.core_group_delete_group_members));
+            StringBuilder query = GetDefaultQuery(Methods.core_group_delete_group_members);
             query.Append(
                 $"&members[0][groupid]={group_id}" +
                 $"&members[0][userid]={user_id}");
 
-            return Get<Success>(query.ToString(), cancellationToken);
+            return Get<Success>(query, cancellationToken);
         }
 
         /// <summary>
@@ -465,15 +445,14 @@ namespace MoodleApiWrapper
         /// <returns></returns>
         public Task<ApiResponse<Category>> GetCategories(string criteria_key, string criteria_value, int addSubCategories = 1, CancellationToken cancellationToken = default)
         {
-            StringBuilder query = new();
-            query.Append(GetDefaultQuery(Methods.core_course_get_categories));
+            StringBuilder query = GetDefaultQuery(Methods.core_course_get_categories);
             query.Append(
                 $"&criteria[0][key]={criteria_key}" +
                 $"&criteria[0][value]={criteria_value}");
 
             if (addSubCategories != 1) query.Append($"&addsubcategories={addSubCategories}");
 
-            return Get<Category>(query.ToString(), cancellationToken);
+            return Get<Category>(query, cancellationToken);
         }
 
         /// <summary>
@@ -483,12 +462,11 @@ namespace MoodleApiWrapper
         /// <returns></returns>
         public Task<ApiResponse<Course>> GetCourses(int options = int.MinValue, CancellationToken cancellationToken = default)
         {
-            StringBuilder query = new();
-            query.Append(GetDefaultQuery(Methods.core_course_get_courses));
+            StringBuilder query = GetDefaultQuery(Methods.core_course_get_courses);
 
             if (options != int.MinValue) query.Append($"&addsubcategories={options}");
 
-            return Get<Course>(query.ToString(), cancellationToken);
+            return Get<Course>(query, cancellationToken);
         }
 
         /// <summary>
@@ -498,11 +476,10 @@ namespace MoodleApiWrapper
         /// <returns></returns>
         public Task<ApiResponse<Content>> GetContents(int course_id, CancellationToken cancellationToken = default)
         {
-            StringBuilder query = new();
-            query.Append(GetDefaultQuery(Methods.core_course_get_contents));
+            StringBuilder query = GetDefaultQuery(Methods.core_course_get_contents);
             query.Append($"&courseid={course_id}");
 
-            return Get<Content>(query.ToString(), cancellationToken);
+            return Get<Content>(query, cancellationToken);
         }
 
         /// <summary>
@@ -512,11 +489,10 @@ namespace MoodleApiWrapper
         /// <returns></returns>
         public Task<ApiResponse<Group>> GetGroup(int group_id, CancellationToken cancellationToken = default)
         {
-            StringBuilder query = new();
-            query.Append(GetDefaultQuery(Methods.core_group_get_groups));
+            StringBuilder query = GetDefaultQuery(Methods.core_group_get_groups);
             query.Append($"&groupids[0]={group_id}");
 
-            return Get<Group>(query.ToString(), cancellationToken);
+            return Get<Group>(query, cancellationToken);
         }
 
         /// <summary>
@@ -526,13 +502,12 @@ namespace MoodleApiWrapper
         /// <returns></returns>
         public Task<ApiResponse<Group>> GetGroups(int[] group_ids, CancellationToken cancellationToken = default)
         {
-            StringBuilder query = new();
-            query.Append(GetDefaultQuery(Methods.core_group_get_groups));
+            StringBuilder query = GetDefaultQuery(Methods.core_group_get_groups);
 
             for (int i = 0; i < group_ids.Length; i++)
                 query.Append($"&groupids[{i}]={group_ids[i]}");
 
-            return Get<Group>(query.ToString(), cancellationToken);
+            return Get<Group>(query, cancellationToken);
         }
 
         /// <summary>
@@ -542,11 +517,10 @@ namespace MoodleApiWrapper
         /// <returns></returns>
         public Task<ApiResponse<Group>> GetCourseGroups(int course_id, CancellationToken cancellationToken = default)
         {
-            StringBuilder query = new();
-            query.Append(GetDefaultQuery(Methods.core_group_get_course_groups));
+            StringBuilder query = GetDefaultQuery(Methods.core_group_get_course_groups);
             query.Append($"&courseid={course_id}");
 
-            return Get<Group>(query.ToString(), cancellationToken);
+            return Get<Group>(query, cancellationToken);
         }
 
         /// <summary>
@@ -556,11 +530,10 @@ namespace MoodleApiWrapper
         /// <returns></returns>
         public Task<ApiResponse<EnrolledUser>> GetEnrolledUsersByCourse(int course_id, CancellationToken cancellationToken = default)
         {
-            StringBuilder query = new();
-            query.Append(GetDefaultQuery(Methods.core_enrol_get_enrolled_users));
+            StringBuilder query = GetDefaultQuery(Methods.core_enrol_get_enrolled_users);
             query.Append($"&courseid={course_id}");
 
-            return Get<EnrolledUser>(query.ToString(), cancellationToken);
+            return Get<EnrolledUser>(query, cancellationToken);
         }
 
         /// <summary>
@@ -593,8 +566,7 @@ namespace MoodleApiWrapper
         /// <returns></returns>
         public Task<ApiResponse<NewCourse>> CreateCourse(CourseModel course, CancellationToken cancellationToken = default)
         {
-            StringBuilder query = new();
-            query.Append(GetDefaultQuery(Methods.core_course_create_courses));
+            StringBuilder query = GetDefaultQuery(Methods.core_course_create_courses);
             query.Append(
                 $"&courses[0][fullname]={course.Fullname}" +
                 $"&courses[0][shortname]={course.Shortname}" +
@@ -620,7 +592,7 @@ namespace MoodleApiWrapper
             if (course.lang.Any()) query.Append($"&courses[0][lang]={course.lang}");
             if (course.forcetheme.Any()) query.Append($"&courses[0][forcetheme]={course.forcetheme}");
 
-            return Get<NewCourse>(query.ToString(), cancellationToken);
+            return Get<NewCourse>(query, cancellationToken);
         }
 
         /// <summary>
@@ -632,8 +604,7 @@ namespace MoodleApiWrapper
         /// <returns></returns>
         public Task<ApiResponse<NewCourse>> CreateCourses(CourseModel[] courses, int[] category_ids = default, CancellationToken cancellationToken = default)
         {
-            StringBuilder query = new();
-            query.Append(GetDefaultQuery(Methods.core_course_create_courses));
+            StringBuilder query = GetDefaultQuery(Methods.core_course_create_courses);
 
             for (var i = 0; i < courses.Length; i++)
             {
@@ -644,7 +615,7 @@ namespace MoodleApiWrapper
                 query.Append($"&courses[{i}][{nameof(course.CategoryId).ToLower()}]={course.CategoryId}");
             }
 
-            return Get<NewCourse>(query.ToString(), cancellationToken);
+            return Get<NewCourse>(query, cancellationToken);
         }
 
         public Task<ApiResponse<UpdateCourseRoot>> UpdateCourse(int id, string fullname = "", string shortname = "", int category_id = Int32.MaxValue,
@@ -655,8 +626,7 @@ namespace MoodleApiWrapper
             int completenotify = 0, string lang = "", string forcetheme = "",
             string courcCourseformatoption = "" /*not implemented*/, CancellationToken cancellationToken = default)
         {
-            StringBuilder query = new();
-            query.Append(GetDefaultQuery(Methods.core_course_update_courses));
+            StringBuilder query = GetDefaultQuery(Methods.core_course_update_courses);
             query.Append($"&courses[0][id]={id}");
 
             if (fullname.Any()) query.Append($"&courses[0][fullname]={fullname}");
@@ -682,7 +652,7 @@ namespace MoodleApiWrapper
             if (lang.Any()) query.Append($"&courses[0][lang]={lang}");
             if (forcetheme.Any()) query.Append($"&courses[0][forcetheme]={forcetheme}");
 
-            return Get<UpdateCourseRoot>(query.ToString(), cancellationToken);
+            return Get<UpdateCourseRoot>(query, cancellationToken);
         }
 
         /// <summary>
@@ -694,8 +664,7 @@ namespace MoodleApiWrapper
         /// <returns></returns>
         public Task<ApiResponse<Category>> GetGrades(int courseid, string component = "", int activityid = Int32.MaxValue, string[] userids = null, CancellationToken cancellationToken = default)
         {
-            StringBuilder query = new();
-            query.Append(GetDefaultQuery(Methods.core_grades_get_grades));
+            StringBuilder query = GetDefaultQuery(Methods.core_grades_get_grades);
 
             query.Append($"&courseid={courseid}");
 
@@ -704,7 +673,7 @@ namespace MoodleApiWrapper
             if (userids != null) query.Append($"&userids={userids}");
             if (component.Any()) query.Append($"&component={component}");
 
-            return Get<Category>(query.ToString(), cancellationToken);
+            return Get<Category>(query, cancellationToken);
         }
 
         /// <summary>
@@ -716,8 +685,7 @@ namespace MoodleApiWrapper
         /// <returns></returns>
         public Task<ApiResponse<Events>> GetCalanderEvents(int[] groupids = default, int[] courseids = default, int[] eventids = default, CancellationToken cancellationToken = default)
         {
-            StringBuilder query = new();
-            query.Append(GetDefaultQuery(Methods.core_calendar_get_calendar_events));
+            StringBuilder query = GetDefaultQuery(Methods.core_calendar_get_calendar_events);
 
             if (groupids != null)
                 for (int i = 0; i < groupids.Length; i++)
@@ -731,7 +699,7 @@ namespace MoodleApiWrapper
                 for (int i = 0; i < eventids.Length; i++)
                     query.Append($"&events[eventids][{i}]={eventids[i]}");
 
-            return Get<Events>(query.ToString(), cancellationToken);
+            return Get<Events>(query, cancellationToken);
         }
 
         /// <summary>
@@ -754,8 +722,7 @@ namespace MoodleApiWrapper
             string[] eventtypes = default, DateTime[] timestarts = default, TimeSpan[] timedurations = default,
             int[] visible = default, int[] sequences = default, CancellationToken cancellationToken = default)
         {
-            StringBuilder query = new();
-            query.Append(GetDefaultQuery(Methods.core_calendar_create_calendar_events));
+            StringBuilder query = GetDefaultQuery(Methods.core_calendar_create_calendar_events);
 
             for (int i = 0; i < names.Length; i++)
                 query.Append($"&events[{i}][name]={names[i]}");
@@ -796,7 +763,7 @@ namespace MoodleApiWrapper
                 for (int i = 0; i < sequences.Length; i++)
                     query.Append($"&events[{i}][sequence]={sequences[i]}");
 
-            return Get<Events>(query.ToString(), cancellationToken);
+            return Get<Events>(query, cancellationToken);
         }
 
         /// <summary>
@@ -808,8 +775,7 @@ namespace MoodleApiWrapper
         /// <returns></returns>
         public Task<ApiResponse<Events>> DeleteCalanderEvents(int[] eventids, int[] repeats, string[] descriptions = default, CancellationToken cancellationToken = default)
         {
-            StringBuilder query = new();
-            query.Append(GetDefaultQuery(Methods.core_calendar_delete_calendar_events));
+            StringBuilder query = GetDefaultQuery(Methods.core_calendar_delete_calendar_events);
 
             if (repeats != null)
                 for (int i = 0; i < repeats.Length; i++)
@@ -824,7 +790,7 @@ namespace MoodleApiWrapper
                 for (int i = 0; i < descriptions.Length; i++)
                     query.Append($"&events[{i}][description]={descriptions[i]}");
 
-            return Get<Events>(query.ToString(), cancellationToken);
+            return Get<Events>(query, cancellationToken);
         }
 
         /// <summary>
@@ -840,8 +806,7 @@ namespace MoodleApiWrapper
         public Task<ApiResponse<Group>> CreateGroups(string[] names = default, int[] courseids = default, string[] descriptions = default,
             int[] descriptionformats = default, string[] enrolmentkeys = default, string[] idnumbers = default, CancellationToken cancellationToken = default)
         {
-            StringBuilder query = new();
-            query.Append(GetDefaultQuery(Methods.core_group_create_groups));
+            StringBuilder query = GetDefaultQuery(Methods.core_group_create_groups);
 
             if (names != null)
                 for (int i = 0; i < names.Length; i++)
@@ -867,7 +832,7 @@ namespace MoodleApiWrapper
                 for (int i = 0; i < idnumbers.Length; i++)
                     query.Append($"&groups[{i}][idnumber]={idnumbers[i]}");
 
-            return Get<Group>(query.ToString(), cancellationToken);
+            return Get<Group>(query, cancellationToken);
         }
 
         /// <summary>
@@ -902,8 +867,10 @@ namespace MoodleApiWrapper
         /// <typeparam names="T"></typeparam>
         /// <param names="uri"></param>
         /// <returns></returns>
-        private async Task<ApiResponse<T>> Get<T>(string uri, CancellationToken cancellationToken) where T : IDataModel
+        private async Task<ApiResponse<T>> Get<T>(StringBuilder stringBuilder, CancellationToken cancellationToken) where T : IDataModel
         {
+            var uri = stringBuilder.ToString();
+
             if (uri.Length > 2000)
                 throw new Exception("URI is too long should be splitted into multiple queries");
 
@@ -934,12 +901,10 @@ namespace MoodleApiWrapper
             client?.Dispose();
         }
 
-        private string GetDefaultQuery(Methods method)
-        {
-            return "webservice/rest/server.php?" +
+        private StringBuilder GetDefaultQuery(Methods method)
+            => new("webservice/rest/server.php?" +
                 $"wstoken={apiToken}&" +
                 $"wsfunction={method}&" +
-                $"moodlewsrestformat={Format.json}";
-        }
+                $"moodlewsrestformat={Format.json}");
     }
 }
