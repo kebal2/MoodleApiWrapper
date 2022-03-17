@@ -26,11 +26,9 @@ namespace MoodleApiWrapper
                 BaseAddress = host
             };
 
-            if (!HostIsSet && TokenIsSet)
-                throw new Exception("Host & token are not set");
             if (!HostIsSet)
                 throw new Exception("Host is not set");
-            else
+            if (!TokenIsSet)
                 throw new Exception("Token is not set");
         }
 
