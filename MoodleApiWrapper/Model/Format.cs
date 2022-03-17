@@ -5,6 +5,6 @@
 /// </summary>
 public enum Format
 {
-    JSON,
-    XML
+    json,
+    xml
 }

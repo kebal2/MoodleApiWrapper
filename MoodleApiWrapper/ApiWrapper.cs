@@ -46,8 +46,8 @@ namespace MoodleApiWrapper
                 query =
                     "webservice/rest/server.php?" +
                     $"wstoken={apiToken}&" +
-                    $"wsfunction={ParseMethod(Methods.core_course_delete_courses)}&" +
-                    $"moodlewsrestformat={ParseFormat(Format.JSON)}&";
+                    $"wsfunction={Methods.core_course_delete_courses}&" +
+                    $"moodlewsrestformat={Format.json}&";
 
                 for (int i = 0; i < courseIds.Length; i++)
                     query += $"courseids[{i}]={courseIds[i]}&";
@@ -63,84 +63,6 @@ namespace MoodleApiWrapper
                 else
                     throw new Exception("Token is not set");
             }
-        }
-
-        private string ParseFormat(Format format)
-        {
-            switch (format)
-            {
-                case Format.JSON:
-                    return "json";
-                case Format.XML:
-                    return "xml";
-            }
-
-            throw new ArgumentOutOfRangeException("format");
-        }
-
-        private string ParseMethod(Methods method)
-        {
-            switch (method)
-            {
-                case Methods.core_webservice_get_site_info:
-                    return "core_webservice_get_site_info";
-                case Methods.core_user_get_users:
-                    return "core_user_get_users";
-                case Methods.core_user_get_users_by_field:
-                    return "core_user_get_users_by_field";
-                case Methods.core_enrol_get_users_courses:
-                    return "core_enrol_get_users_courses";
-                case Methods.core_user_create_users:
-                    return "core_user_create_users";
-                case Methods.core_user_update_users:
-                    return "core_user_update_users";
-                case Methods.core_user_delete_users:
-                    return "core_user_delete_users";
-                case Methods.core_role_assign_roles:
-                    return "core_role_assign_roles";
-                case Methods.core_role_unassign_roles:
-                    return "core_role_unassign_roles";
-                case Methods.enrol_manual_enrol_users:
-                    return "enrol_manual_enrol_users";
-                case Methods.core_group_add_group_members:
-                    return "core_group_add_group_members";
-                case Methods.core_group_delete_group_members:
-                    return "core_group_delete_group_members";
-                case Methods.core_course_get_categories:
-                    return "core_course_get_categories";
-                case Methods.core_course_get_courses:
-                    return "core_course_get_courses";
-                case Methods.core_course_get_contents:
-                    return "core_course_get_contents";
-                case Methods.core_group_get_groups:
-                    return "core_group_get_groups";
-                case Methods.core_group_get_course_groups:
-                    return "core_group_get_course_groups";
-                case Methods.core_enrol_get_enrolled_users:
-                    return "core_enrol_get_enrolled_users";
-                case Methods.core_course_create_courses:
-                    return "core_course_create_courses";
-                case Methods.core_course_delete_courses:
-                    return Methods.core_course_delete_courses.ToString();
-                case Methods.core_course_update_courses:
-                    return "core_course_update_courses";
-                case Methods.core_grades_get_grades:
-                    return "core_grades_get_grades";
-                case Methods.core_grades_update_grades:
-                    return "core_grades_update_grades";
-                case Methods.core_grading_get_definitions:
-                    return "core_grading_get_definitions";
-                case Methods.core_calendar_get_calendar_events:
-                    return "core_calendar_get_calendar_events";
-                case Methods.core_calendar_create_calendar_events:
-                    return "core_calendar_create_calendar_events";
-                case Methods.core_calendar_delete_calendar_events:
-                    return "core_calendar_delete_calendar_events";
-                case Methods.default_:
-                    return "";
-            }
-
-            throw new ArgumentOutOfRangeException("method");
         }
 
         /// <summary>
@@ -186,13 +108,13 @@ namespace MoodleApiWrapper
                 {
                     query = string.Format("webservice/rest/server.php" +
                                           "?wstoken={0}&moodlewsrestformat={1}&wsfunction={2}",
-                        apiToken, ParseFormat(Format.JSON), ParseMethod(Methods.core_webservice_get_site_info));
+                        apiToken, Format.json.ToString(), Methods.core_webservice_get_site_info.ToString());
                 }
                 else
                 {
                     query = string.Format("webservice/rest/server.php" +
                                           "?wstoken={0}&moodlewsrestformat={1}&wsfunction={2}&serviceshortnames[0]={3}",
-                        apiToken, ParseFormat(Format.JSON), ParseMethod(Methods.core_webservice_get_site_info),
+                        apiToken, Format.json.ToString(), Methods.core_webservice_get_site_info.ToString(),
                         serviceHostName);
                 }
 
@@ -239,8 +161,8 @@ namespace MoodleApiWrapper
                     query =
                         "webservice/rest/server.php?" +
                         $"wstoken={apiToken}&" +
-                        $"wsfunction={ParseMethod(Methods.core_user_get_users)}&" +
-                        $"moodlewsrestformat={ParseFormat(Format.JSON)}&" +
+                        $"wsfunction={Methods.core_user_get_users}&" +
+                        $"moodlewsrestformat={Format.json}&" +
                         $"criteria[0][key]={criteria_key0}&" +
                         $"criteria[0][value]={criteria_value0}" +
                         $"criteria[1][key]={criteria_key0}&" +
@@ -251,8 +173,8 @@ namespace MoodleApiWrapper
                     query =
                         "webservice/rest/server.php?" +
                         $"wstoken={apiToken}&" +
-                        $"wsfunction={ParseMethod(Methods.core_user_get_users)}&" +
-                        $"moodlewsrestformat={ParseFormat(Format.JSON)}&" +
+                        $"wsfunction={Methods.core_user_get_users}&" +
+                        $"moodlewsrestformat={Format.json}&" +
                         $"criteria[0][key]={criteria_key0}&" +
                         $"criteria[0][value]={criteria_value0}";
                 }
@@ -293,8 +215,8 @@ namespace MoodleApiWrapper
                 query =
                     "webservice/rest/server.php?" +
                     $"wstoken={apiToken}&" +
-                    $"wsfunction={ParseMethod(Methods.core_user_get_users_by_field)}&" +
-                    $"moodlewsrestformat={ParseFormat(Format.JSON)}&" +
+                    $"wsfunction={Methods.core_user_get_users_by_field}&" +
+                    $"moodlewsrestformat={Format.json}&" +
                     $"criteria[0][key]={criteria_key}&" +
                     $"criteria[0][value]={criteria_value}";
 
@@ -322,8 +244,8 @@ namespace MoodleApiWrapper
                 query =
                     "webservice/rest/server.php?" +
                     $"wstoken={apiToken}&" +
-                    $"wsfunction={ParseMethod(Methods.core_enrol_get_users_courses)}&" +
-                    $"moodlewsrestformat={ParseFormat(Format.JSON)}&" +
+                    $"wsfunction={Methods.core_enrol_get_users_courses}&" +
+                    $"moodlewsrestformat={Format.json}&" +
                     $"userid={userid}";
 
                 return Get<Cources>(query.ToString(), cancellationToken);
@@ -381,8 +303,8 @@ namespace MoodleApiWrapper
                 StringBuilder querybuilder = new StringBuilder();
                 querybuilder.Append(
                     "webservice/rest/server.php?" +
-                    $"wstoken={apiToken}&wsfunction={ParseMethod(Methods.core_user_create_users)}&" +
-                    $"moodlewsrestformat={ParseFormat(Format.JSON)}&" +
+                    $"wstoken={apiToken}&wsfunction={Methods.core_user_create_users}&" +
+                    $"moodlewsrestformat={Format.json}&" +
                     $"users[0][username]={@username}&" +
                     $"users[0][password]={@password}&" +
                     $"users[0][firstname]={@firstname}&" +
@@ -464,8 +386,8 @@ namespace MoodleApiWrapper
                 StringBuilder querybuilder = new StringBuilder();
                 querybuilder.Append(
                     "webservice/rest/server.php?" +
-                    $"wstoken={apiToken}&wsfunction={ParseMethod(Methods.core_user_update_users)}&" +
-                    $"moodlewsrestformat={ParseFormat(Format.JSON)}&" +
+                    $"wstoken={apiToken}&wsfunction={Methods.core_user_update_users}&" +
+                    $"moodlewsrestformat={Format.json}&" +
                     $"users[0][id]={id}");
 
                 if (username.Any()) querybuilder.Append($"&users[0][username]={username}");
@@ -519,8 +441,8 @@ namespace MoodleApiWrapper
                 query =
                     "webservice/rest/server.php?" +
                     $"wstoken={apiToken}&" +
-                    $"wsfunction={ParseMethod(Methods.core_user_delete_users)}&" +
-                    $"moodlewsrestformat={ParseFormat(Format.JSON)}&" +
+                    $"wsfunction={Methods.core_user_delete_users}&" +
+                    $"moodlewsrestformat={Format.json}&" +
                     $"userids[0]={id}";
 
                 return Get<Success>(query.ToString(), cancellationToken);
@@ -556,8 +478,8 @@ namespace MoodleApiWrapper
                 query.Append(
                     "webservice/rest/server.php?" +
                     $"wstoken={apiToken}&" +
-                    $"wsfunction={ParseMethod(Methods.core_role_assign_roles)}&" +
-                    $"moodlewsrestformat={ParseFormat(Format.JSON)}&" +
+                    $"wsfunction={Methods.core_role_assign_roles}&" +
+                    $"moodlewsrestformat={Format.json}&" +
                     $"assignments[0][roleid]={role_id}&" +
                     $"assignments[0][userid]={user_id}");
                 if (context_id.Any()) query.Append($"&assignments[0][contextid]={context_id}");
@@ -595,8 +517,8 @@ namespace MoodleApiWrapper
                 query.Append(
                     "webservice/rest/server.php?" +
                     $"wstoken={apiToken}&" +
-                    $"wsfunction={ParseMethod(Methods.core_role_unassign_roles)}&" +
-                    $"moodlewsrestformat={ParseFormat(Format.JSON)}&" +
+                    $"wsfunction={Methods.core_role_unassign_roles}&" +
+                    $"moodlewsrestformat={Format.json}&" +
                     $"unassignments[0][roleid]={role_id}&" +
                     $"unassignments[0][userid]={user_id}");
                 if (context_id.Any()) query.Append($"&unassignments[0][contextid]={context_id}");
@@ -635,8 +557,8 @@ namespace MoodleApiWrapper
                 query.Append(
                     "webservice/rest/server.php?" +
                     $"wstoken={apiToken}&" +
-                    $"wsfunction={ParseMethod(Methods.enrol_manual_enrol_users)}&" +
-                    $"moodlewsrestformat={ParseFormat(Format.JSON)}&" +
+                    $"wsfunction={Methods.enrol_manual_enrol_users}&" +
+                    $"moodlewsrestformat={Format.json}&" +
                     $"enrolments[0][roleid]={role_id}&" +
                     $"enrolments[0][userid]={user_id}&" +
                     $"enrolments[0][courceid]={cource_id}");
@@ -671,8 +593,8 @@ namespace MoodleApiWrapper
                 query.Append(
                     "webservice/rest/server.php?" +
                     $"wstoken={apiToken}&" +
-                    $"wsfunction={ParseMethod(Methods.core_group_add_group_members)}&" +
-                    $"moodlewsrestformat={ParseFormat(Format.JSON)}&" +
+                    $"wsfunction={Methods.core_group_add_group_members}&" +
+                    $"moodlewsrestformat={Format.json}&" +
                     $"members[0][groupid]={group_id}&" +
                     $"members[0][userid]={user_id}");
 
@@ -703,8 +625,8 @@ namespace MoodleApiWrapper
                 query.Append(
                     "webservice/rest/server.php?" +
                     $"wstoken={apiToken}&" +
-                    $"wsfunction={ParseMethod(Methods.core_group_delete_group_members)}&" +
-                    $"moodlewsrestformat={ParseFormat(Format.JSON)}&" +
+                    $"wsfunction={Methods.core_group_delete_group_members}&" +
+                    $"moodlewsrestformat={Format.json}&" +
                     $"members[0][groupid]={group_id}&" +
                     $"members[0][userid]={user_id}");
 
@@ -745,8 +667,8 @@ namespace MoodleApiWrapper
                 query.Append(
                     "webservice/rest/server.php?" +
                     $"wstoken={apiToken}&" +
-                    $"wsfunction={ParseMethod(Methods.core_course_get_categories)}&" +
-                    $"moodlewsrestformat={ParseFormat(Format.JSON)}&" +
+                    $"wsfunction={Methods.core_course_get_categories}&" +
+                    $"moodlewsrestformat={Format.json}&" +
                     $"criteria[0][key]={criteria_key}&" +
                     $"criteria[0][value]={criteria_value}");
 
@@ -778,8 +700,8 @@ namespace MoodleApiWrapper
                 query.Append(
                     "webservice/rest/server.php?" +
                     $"wstoken={apiToken}&" +
-                    $"wsfunction={ParseMethod(Methods.core_course_get_courses)}&" +
-                    $"moodlewsrestformat={ParseFormat(Format.JSON)}");
+                    $"wsfunction={Methods.core_course_get_courses}&" +
+                    $"moodlewsrestformat={Format.json}");
                 if (options != int.MinValue) query.Append($"&addsubcategories={options}");
 
                 return Get<Course>(query.ToString(), cancellationToken);
@@ -807,8 +729,8 @@ namespace MoodleApiWrapper
                 query.Append(
                     "webservice/rest/server.php?" +
                     $"wstoken={apiToken}&" +
-                    $"wsfunction={ParseMethod(Methods.core_course_get_contents)}&" +
-                    $"moodlewsrestformat={ParseFormat(Format.JSON)}&" +
+                    $"wsfunction={Methods.core_course_get_contents}&" +
+                    $"moodlewsrestformat={Format.json}&" +
                     $"courseid={course_id}");
 
                 return Get<Content>(query.ToString(), cancellationToken);
@@ -837,8 +759,8 @@ namespace MoodleApiWrapper
                 query.Append(
                     "webservice/rest/server.php?" +
                     $"wstoken={apiToken}&" +
-                    $"wsfunction={ParseMethod(Methods.core_group_get_groups)}&" +
-                    $"moodlewsrestformat={ParseFormat(Format.JSON)}&" +
+                    $"wsfunction={Methods.core_group_get_groups}&" +
+                    $"moodlewsrestformat={Format.json}&" +
                     $"groupids[0]={group_id}");
 
                 return Get<Group>(query.ToString(), cancellationToken);
@@ -867,8 +789,8 @@ namespace MoodleApiWrapper
                 query.Append(
                     "webservice/rest/server.php?" +
                     $"wstoken={apiToken}&" +
-                    $"wsfunction={ParseMethod(Methods.core_group_get_groups)}&" +
-                    $"moodlewsrestformat={ParseFormat(Format.JSON)}");
+                    $"wsfunction={Methods.core_group_get_groups}&" +
+                    $"moodlewsrestformat={Format.json}");
 
                 for (int i = 0; i < group_ids.Count(); i++)
                 {
@@ -901,8 +823,8 @@ namespace MoodleApiWrapper
                 query.Append(
                     "webservice/rest/server.php?" +
                     $"wstoken={apiToken}&" +
-                    $"wsfunction={ParseMethod(Methods.core_group_get_course_groups)}&" +
-                    $"moodlewsrestformat={ParseFormat(Format.JSON)}&" +
+                    $"wsfunction={Methods.core_group_get_course_groups}&" +
+                    $"moodlewsrestformat={Format.json}&" +
                     $"courseid={course_id}");
 
                 return Get<Group>(query.ToString(), cancellationToken);
@@ -931,8 +853,8 @@ namespace MoodleApiWrapper
                 query.Append(
                     "webservice/rest/server.php?" +
                     $"wstoken={apiToken}&" +
-                    $"wsfunction={ParseMethod(Methods.core_enrol_get_enrolled_users)}&" +
-                    $"moodlewsrestformat={ParseFormat(Format.JSON)}&" +
+                    $"wsfunction={Methods.core_enrol_get_enrolled_users}&" +
+                    $"moodlewsrestformat={Format.json}&" +
                     $"courseid={course_id}");
 
                 return Get<EnrolledUser>(query.ToString(), cancellationToken);
@@ -984,8 +906,8 @@ namespace MoodleApiWrapper
                 query.Append(
                     "webservice/rest/server.php?" +
                     $"wstoken={apiToken}&" +
-                    $"wsfunction={ParseMethod(Methods.core_course_create_courses)}&" +
-                    $"moodlewsrestformat={ParseFormat(Format.JSON)}&" +
+                    $"wsfunction={Methods.core_course_create_courses}&" +
+                    $"moodlewsrestformat={Format.json}&" +
                     $"courses[0][fullname]={course.Fullname}&" +
                     $"courses[0][shortname]={course.Shortname}&" +
                     $"courses[0][categoryid]={course.CategoryId}");
@@ -1036,8 +958,8 @@ namespace MoodleApiWrapper
                 query.Append(
                     "webservice/rest/server.php?" +
                     $"wstoken={apiToken}&" +
-                    $"wsfunction={ParseMethod(Methods.core_course_create_courses)}&" +
-                    $"moodlewsrestformat={ParseFormat(Format.JSON)}");
+                    $"wsfunction={Methods.core_course_create_courses}&" +
+                    $"moodlewsrestformat={Format.json}");
 
                 for (var i = 0; i < courses.Length; i++)
                 {
@@ -1073,8 +995,8 @@ namespace MoodleApiWrapper
                 query.Append(
                     "webservice/rest/server.php?" +
                     $"wstoken={apiToken}&" +
-                    $"wsfunction={ParseMethod(Methods.core_course_update_courses)}&" +
-                    $"moodlewsrestformat={ParseFormat(Format.JSON)}&" +
+                    $"wsfunction={Methods.core_course_update_courses}&" +
+                    $"moodlewsrestformat={Format.json}&" +
                     $"courses[0][id]={id}");
 
                 if (fullname.Any()) query.Append($"&courses[0][fullname]={fullname}");
@@ -1128,8 +1050,8 @@ namespace MoodleApiWrapper
                 query.Append(
                     "webservice/rest/server.php?" +
                     $"wstoken={apiToken}&" +
-                    $"wsfunction={ParseMethod(Methods.core_grades_get_grades)}&" +
-                    $"moodlewsrestformat={ParseFormat(Format.JSON)}&" +
+                    $"wsfunction={Methods.core_grades_get_grades}&" +
+                    $"moodlewsrestformat={Format.json}&" +
                     $"courseid={courseid}");
 
                 if (component.Any()) query.Append($"&component={component}");
@@ -1165,8 +1087,8 @@ namespace MoodleApiWrapper
                 query.Append(
                     "webservice/rest/server.php?" +
                     $"wstoken={apiToken}&" +
-                    $"wsfunction={ParseMethod(Methods.core_calendar_get_calendar_events)}&" +
-                    $"moodlewsrestformat={ParseFormat(Format.JSON)}");
+                    $"wsfunction={Methods.core_calendar_get_calendar_events}&" +
+                    $"moodlewsrestformat={Format.json}");
 
                 if (groupids != null)
                     for (int i = 0; i < groupids.Count(); i++)
@@ -1219,8 +1141,8 @@ namespace MoodleApiWrapper
                 query.Append(
                     "webservice/rest/server.php?" +
                     $"wstoken={apiToken}&" +
-                    $"wsfunction={ParseMethod(Methods.core_calendar_create_calendar_events)}&" +
-                    $"moodlewsrestformat={ParseFormat(Format.JSON)}");
+                    $"wsfunction={Methods.core_calendar_create_calendar_events}&" +
+                    $"moodlewsrestformat={Format.json}");
 
                 for (int i = 0; i < names.Count(); i++)
                     query.Append($"&events[{i}][name]={names[i]}");
@@ -1289,8 +1211,8 @@ namespace MoodleApiWrapper
                 query.Append(
                     "webservice/rest/server.php?" +
                     $"wstoken={apiToken}&" +
-                    $"wsfunction={ParseMethod(Methods.core_calendar_delete_calendar_events)}&" +
-                    $"moodlewsrestformat={ParseFormat(Format.JSON)}");
+                    $"wsfunction={Methods.core_calendar_delete_calendar_events}&" +
+                    $"moodlewsrestformat={Format.json}");
 
                 if (repeats != null)
                     for (int i = 0; i < repeats.Count(); i++)
@@ -1338,7 +1260,7 @@ namespace MoodleApiWrapper
                     "webservice/rest/server.php?" +
                     $"wstoken={apiToken}&" +
                     $"wsfunction=core_group_create_groups&" +
-                    $"moodlewsrestformat={ParseFormat(Format.JSON)}");
+                    $"moodlewsrestformat={Format.json}");
 
                 if (names != null)
                     for (int i = 0; i < names.Count(); i++)
@@ -1429,7 +1351,7 @@ namespace MoodleApiWrapper
                 var data = JArray.Parse(result);
                 return new ApiResponse<T>(new ApiResponseRaw(data));
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 var data = JObject.Parse(result);
                 return new ApiResponse<T>(new ApiResponseRaw(data));
