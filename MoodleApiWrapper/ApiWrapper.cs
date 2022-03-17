@@ -45,14 +45,11 @@ namespace MoodleApiWrapper
 
         public Task<ApiResponse<Success>> DeleteCourses(int[] courseIds, CancellationToken cancellationToken = default)
         {
-            string query =
-                "webservice/rest/server.php?" +
-                $"wstoken={apiToken}&" +
-                $"wsfunction={Methods.core_course_delete_courses}&" +
-                $"moodlewsrestformat={Format.json}&";
+            StringBuilder query = new();
+            query.Append(GetDefaultQuery(Methods.core_course_delete_courses));
 
             for (int i = 0; i < courseIds.Length; i++)
-                query += $"courseids[{i}]={courseIds[i]}&";
+                query.Append($"&courseids[{i}]={courseIds[i]}");
 
             return Get<Success>(query.ToString(), cancellationToken);
         }
@@ -91,19 +88,17 @@ namespace MoodleApiWrapper
         /// <returns></returns>
         public Task<ApiResponse<Site_info>> GetSiteInfo(string serviceHostName = "", CancellationToken cancellationToken = default)
         {
-            string query;
+            StringBuilder query = new();
+
+            //string query;
             if (!serviceHostName.Any())
             {
-                query = string.Format("webservice/rest/server.php" +
-                                      "?wstoken={0}&moodlewsrestformat={1}&wsfunction={2}",
-                    apiToken, Format.json.ToString(), Methods.core_webservice_get_site_info.ToString());
+                query.Append(GetDefaultQuery(Methods.core_webservice_get_site_info));
             }
             else
             {
-                query = string.Format("webservice/rest/server.php" +
-                                      "?wstoken={0}&moodlewsrestformat={1}&wsfunction={2}&serviceshortnames[0]={3}",
-                    apiToken, Format.json.ToString(), Methods.core_webservice_get_site_info.ToString(),
-                    serviceHostName);
+                query.Append(GetDefaultQuery(Methods.core_webservice_get_site_info));
+                query.Append($"&serviceshortnames[0]={serviceHostName}");
             }
 
             return Get<Site_info>(query.ToString(), cancellationToken);
@@ -131,28 +126,21 @@ namespace MoodleApiWrapper
         /// <returns></returns>
         public Task<ApiResponse<Users>> GetUsers(string criteria_key0, string criteria_value0, string criteria_key1 = "", string criteria_value1 = "", CancellationToken cancellationToken = default)
         {
-            string query;
+            StringBuilder query = new();
+            query.Append(GetDefaultQuery(Methods.core_user_get_users));
             if (criteria_key1.Any() && criteria_value1.Any())
             {
-                query =
-                    "webservice/rest/server.php?" +
-                    $"wstoken={apiToken}&" +
-                    $"wsfunction={Methods.core_user_get_users}&" +
-                    $"moodlewsrestformat={Format.json}&" +
-                    $"criteria[0][key]={criteria_key0}&" +
-                    $"criteria[0][value]={criteria_value0}" +
-                    $"criteria[1][key]={criteria_key0}&" +
-                    $"criteria[1][value]={criteria_value0}";
+                query.Append(
+                    $"&criteria[0][key]={criteria_key0}" +
+                    $"&criteria[0][value]={criteria_value0}" +
+                    $"&criteria[1][key]={criteria_key0}" +
+                    $"&criteria[1][value]={criteria_value0}");
             }
             else
             {
-                query =
-                    "webservice/rest/server.php?" +
-                    $"wstoken={apiToken}&" +
-                    $"wsfunction={Methods.core_user_get_users}&" +
-                    $"moodlewsrestformat={Format.json}&" +
-                    $"criteria[0][key]={criteria_key0}&" +
-                    $"criteria[0][value]={criteria_value0}";
+                query.Append(
+                    $"&criteria[0][key]={criteria_key0}" +
+                    $"&criteria[0][value]={criteria_value0}");
             }
 
             return Get<Users>(query.ToString(), cancellationToken);
@@ -175,13 +163,11 @@ namespace MoodleApiWrapper
         /// <returns></returns>
         public Task<ApiResponse<Users>> GetUsersByField(string criteria_key, string criteria_value, CancellationToken cancellationToken = default)
         {
-            string query =
-                "webservice/rest/server.php?" +
-                $"wstoken={apiToken}&" +
-                $"wsfunction={Methods.core_user_get_users_by_field}&" +
-                $"moodlewsrestformat={Format.json}&" +
-                $"criteria[0][key]={criteria_key}&" +
-                $"criteria[0][value]={criteria_value}";
+            StringBuilder query = new();
+            query.Append(GetDefaultQuery(Methods.core_user_get_users_by_field));
+            query.Append(
+                $"&criteria[0][key]={criteria_key}" +
+                $"&criteria[0][value]={criteria_value}");
 
             return Get<Users>(query.ToString(), cancellationToken);
         }
@@ -193,12 +179,9 @@ namespace MoodleApiWrapper
         /// <returns></returns>
         public Task<ApiResponse<Cources>> GetUserCourses(int userid, CancellationToken cancellationToken = default)
         {
-            string query =
-                "webservice/rest/server.php?" +
-                $"wstoken={apiToken}&" +
-                $"wsfunction={Methods.core_enrol_get_users_courses}&" +
-                $"moodlewsrestformat={Format.json}&" +
-                $"userid={userid}";
+            StringBuilder query = new();
+            query.Append(GetDefaultQuery(Methods.core_enrol_get_users_courses));
+            query.Append($"&userid={userid}");
 
             return Get<Cources>(query.ToString(), cancellationToken);
         }
@@ -240,36 +223,34 @@ namespace MoodleApiWrapper
             string preferences_type = "", string preferences_value = "",
             string customfields_type = "", string customfields_value = "", CancellationToken cancellationToken = default)
         {
-            StringBuilder querybuilder = new();
-            querybuilder.Append(
-                "webservice/rest/server.php?" +
-                $"wstoken={apiToken}&wsfunction={Methods.core_user_create_users}&" +
-                $"moodlewsrestformat={Format.json}&" +
-                $"users[0][username]={@username}&" +
-                $"users[0][password]={@password}&" +
-                $"users[0][firstname]={@firstname}&" +
-                $"users[0][lastname]={@lastname}&" +
-                $"users[0][email]={@email}");
-            if (auth.Any()) querybuilder.Append($"&users[0][auth]={auth}");
-            if (idnumber.Any()) querybuilder.Append($"&users[0][auth]={idnumber}");
-            if (lang.Any()) querybuilder.Append($"&users[0][auth]={lang}");
-            if (calendartye.Any()) querybuilder.Append($"&users[0][auth]={calendartye}");
-            if (theme.Any()) querybuilder.Append($"&users[0][auth]={theme}");
-            if (timezone.Any()) querybuilder.Append($"&users[0][auth]={timezone}");
-            if (mailformat.Any()) querybuilder.Append($"&users[0][auth]={mailformat}");
-            if (description.Any()) querybuilder.Append($"&users[0][auth]={description}");
-            if (city.Any()) querybuilder.Append($"&users[0][auth]={city}");
-            if (country.Any()) querybuilder.Append($"&users[0][auth]={country}");
-            if (firstnamephonetic.Any()) querybuilder.Append($"&users[0][auth]={firstnamephonetic}");
-            if (lastnamephonetic.Any()) querybuilder.Append($"&users[0][auth]={lastnamephonetic}");
-            if (middlename.Any()) querybuilder.Append($"&users[0][auth]={middlename}");
-            if (alternatename.Any()) querybuilder.Append($"&users[0][auth]={alternatename}");
-            if (preferences_type.Any()) querybuilder.Append($"&users[0][auth]={preferences_type}");
-            if (preferences_value.Any()) querybuilder.Append($"&users[0][auth]={preferences_value}");
-            if (customfields_type.Any()) querybuilder.Append($"&users[0][auth]={customfields_type}");
-            if (customfields_value.Any()) querybuilder.Append($"&users[0][auth]={customfields_value}");
+            StringBuilder query = new();
+            query.Append(GetDefaultQuery(Methods.core_user_create_users));
+            query.Append(
+                $"&users[0][username]={@username}" +
+                $"&users[0][password]={@password}" +
+                $"&users[0][firstname]={@firstname}" +
+                $"&users[0][lastname]={@lastname}" +
+                $"&users[0][email]={@email}");
+            if (auth.Any()) query.Append($"&users[0][auth]={auth}");
+            if (idnumber.Any()) query.Append($"&users[0][auth]={idnumber}");
+            if (lang.Any()) query.Append($"&users[0][auth]={lang}");
+            if (calendartye.Any()) query.Append($"&users[0][auth]={calendartye}");
+            if (theme.Any()) query.Append($"&users[0][auth]={theme}");
+            if (timezone.Any()) query.Append($"&users[0][auth]={timezone}");
+            if (mailformat.Any()) query.Append($"&users[0][auth]={mailformat}");
+            if (description.Any()) query.Append($"&users[0][auth]={description}");
+            if (city.Any()) query.Append($"&users[0][auth]={city}");
+            if (country.Any()) query.Append($"&users[0][auth]={country}");
+            if (firstnamephonetic.Any()) query.Append($"&users[0][auth]={firstnamephonetic}");
+            if (lastnamephonetic.Any()) query.Append($"&users[0][auth]={lastnamephonetic}");
+            if (middlename.Any()) query.Append($"&users[0][auth]={middlename}");
+            if (alternatename.Any()) query.Append($"&users[0][auth]={alternatename}");
+            if (preferences_type.Any()) query.Append($"&users[0][auth]={preferences_type}");
+            if (preferences_value.Any()) query.Append($"&users[0][auth]={preferences_value}");
+            if (customfields_type.Any()) query.Append($"&users[0][auth]={customfields_type}");
+            if (customfields_value.Any()) query.Append($"&users[0][auth]={customfields_value}");
 
-            return Get<NewUser>(querybuilder.ToString(), cancellationToken);
+            return Get<NewUser>(query.ToString(), cancellationToken);
         }
 
         /// <summary>
@@ -310,39 +291,36 @@ namespace MoodleApiWrapper
             string preferences_type = "", string preferences_value = "",
             string customfields_type = "", string customfields_value = "", CancellationToken cancellationToken = default)
         {
-            StringBuilder querybuilder = new();
-            querybuilder.Append(
-                "webservice/rest/server.php?" +
-                $"wstoken={apiToken}&wsfunction={Methods.core_user_update_users}&" +
-                $"moodlewsrestformat={Format.json}&" +
-                $"users[0][id]={id}");
+            StringBuilder query = new();
+            query.Append(GetDefaultQuery(Methods.core_user_update_users));
+            query.Append($"&users[0][id]={id}");
 
-            if (username.Any()) querybuilder.Append($"&users[0][username]={username}");
-            if (password.Any()) querybuilder.Append($"&users[0][password]={password}");
-            if (firstname.Any()) querybuilder.Append($"&users[0][firstname]={firstname}");
-            if (lastname.Any()) querybuilder.Append($"&users[0][lastname]={lastname}");
-            if (email.Any()) querybuilder.Append($"&users[0][email]={email}");
-            if (auth.Any()) querybuilder.Append($"&users[0][auth]={auth}");
-            if (idnumber.Any()) querybuilder.Append($"&users[0][auth]={idnumber}");
-            if (lang.Any()) querybuilder.Append($"&users[0][auth]={lang}");
-            if (calendartye.Any()) querybuilder.Append($"&users[0][auth]={calendartye}");
-            if (theme.Any()) querybuilder.Append($"&users[0][auth]={theme}");
-            if (timezone.Any()) querybuilder.Append($"&users[0][auth]={timezone}");
-            if (mailformat.Any()) querybuilder.Append($"&users[0][auth]={mailformat}");
-            if (description.Any()) querybuilder.Append($"&users[0][auth]={description}");
-            if (city.Any()) querybuilder.Append($"&users[0][auth]={city}");
-            if (country.Any()) querybuilder.Append($"&users[0][auth]={country}");
-            if (firstnamephonetic.Any()) querybuilder.Append($"&users[0][auth]={firstnamephonetic}");
-            if (lastnamephonetic.Any()) querybuilder.Append($"&users[0][auth]={lastnamephonetic}");
-            if (middlename.Any()) querybuilder.Append($"&users[0][auth]={middlename}");
-            if (alternatename.Any()) querybuilder.Append($"&users[0][auth]={alternatename}");
-            if (preferences_type.Any()) querybuilder.Append($"&users[0][auth]={preferences_type}");
-            if (preferences_value.Any()) querybuilder.Append($"&users[0][auth]={preferences_value}");
-            if (customfields_type.Any()) querybuilder.Append($"&users[0][auth]={customfields_type}");
-            if (customfields_value.Any()) querybuilder.Append($"&users[0][auth]={customfields_value}");
+            if (username.Any()) query.Append($"&users[0][username]={username}");
+            if (password.Any()) query.Append($"&users[0][password]={password}");
+            if (firstname.Any()) query.Append($"&users[0][firstname]={firstname}");
+            if (lastname.Any()) query.Append($"&users[0][lastname]={lastname}");
+            if (email.Any()) query.Append($"&users[0][email]={email}");
+            if (auth.Any()) query.Append($"&users[0][auth]={auth}");
+            if (idnumber.Any()) query.Append($"&users[0][auth]={idnumber}");
+            if (lang.Any()) query.Append($"&users[0][auth]={lang}");
+            if (calendartye.Any()) query.Append($"&users[0][auth]={calendartye}");
+            if (theme.Any()) query.Append($"&users[0][auth]={theme}");
+            if (timezone.Any()) query.Append($"&users[0][auth]={timezone}");
+            if (mailformat.Any()) query.Append($"&users[0][auth]={mailformat}");
+            if (description.Any()) query.Append($"&users[0][auth]={description}");
+            if (city.Any()) query.Append($"&users[0][auth]={city}");
+            if (country.Any()) query.Append($"&users[0][auth]={country}");
+            if (firstnamephonetic.Any()) query.Append($"&users[0][auth]={firstnamephonetic}");
+            if (lastnamephonetic.Any()) query.Append($"&users[0][auth]={lastnamephonetic}");
+            if (middlename.Any()) query.Append($"&users[0][auth]={middlename}");
+            if (alternatename.Any()) query.Append($"&users[0][auth]={alternatename}");
+            if (preferences_type.Any()) query.Append($"&users[0][auth]={preferences_type}");
+            if (preferences_value.Any()) query.Append($"&users[0][auth]={preferences_value}");
+            if (customfields_type.Any()) query.Append($"&users[0][auth]={customfields_type}");
+            if (customfields_value.Any()) query.Append($"&users[0][auth]={customfields_value}");
 
 
-            return Get<Success>(querybuilder.ToString(), cancellationToken);
+            return Get<Success>(query.ToString(), cancellationToken);
         }
 
         /// <summary>
@@ -352,12 +330,9 @@ namespace MoodleApiWrapper
         /// <returns></returns>
         public Task<ApiResponse<Success>> DeleteUser(int id, CancellationToken cancellationToken = default)
         {
-            string query =
-                    "webservice/rest/server.php?" +
-                    $"wstoken={apiToken}&" +
-                    $"wsfunction={Methods.core_user_delete_users}&" +
-                    $"moodlewsrestformat={Format.json}&" +
-                    $"userids[0]={id}";
+            StringBuilder query = new();
+            query.Append(GetDefaultQuery(Methods.core_user_delete_users));
+            query.Append($"&userids[0]={id}");
 
             return Get<Success>(query.ToString(), cancellationToken);
         }
@@ -377,13 +352,10 @@ namespace MoodleApiWrapper
             string context_level = "", int instance_id = Int32.MinValue, CancellationToken cancellationToken = default)
         {
             StringBuilder query = new();
+            query.Append(GetDefaultQuery(Methods.core_role_assign_roles));
             query.Append(
-                "webservice/rest/server.php?" +
-                $"wstoken={apiToken}&" +
-                $"wsfunction={Methods.core_role_assign_roles}&" +
-                $"moodlewsrestformat={Format.json}&" +
-                $"assignments[0][roleid]={role_id}&" +
-                $"assignments[0][userid]={user_id}");
+                $"&assignments[0][roleid]={role_id}" +
+                $"&assignments[0][userid]={user_id}");
             if (context_id.Any()) query.Append($"&assignments[0][contextid]={context_id}");
             if (context_level.Any()) query.Append($"&assignments[0][contextlevel]={context_level}");
             if (instance_id != Int32.MinValue) query.Append($"&assignments[0][instanceid]={instance_id}");
@@ -404,13 +376,10 @@ namespace MoodleApiWrapper
             string context_level = "", int instance_id = Int32.MinValue, CancellationToken cancellationToken = default)
         {
             StringBuilder query = new();
+            query.Append(GetDefaultQuery(Methods.core_role_unassign_roles));
             query.Append(
-                "webservice/rest/server.php?" +
-                $"wstoken={apiToken}&" +
-                $"wsfunction={Methods.core_role_unassign_roles}&" +
-                $"moodlewsrestformat={Format.json}&" +
-                $"unassignments[0][roleid]={role_id}&" +
-                $"unassignments[0][userid]={user_id}");
+                $"&unassignments[0][roleid]={role_id}" +
+                $"&unassignments[0][userid]={user_id}");
             if (context_id.Any()) query.Append($"&unassignments[0][contextid]={context_id}");
             if (context_level.Any()) query.Append($"&unassignments[0][contextlevel]={context_level}");
             if (instance_id != Int32.MinValue) query.Append($"&unassignments[0][instanceid]={instance_id}");
@@ -432,14 +401,11 @@ namespace MoodleApiWrapper
             int timestart = Int32.MinValue, int timeend = Int32.MinValue, int suspend = Int32.MinValue, CancellationToken cancellationToken = default)
         {
             StringBuilder query = new();
+            query.Append(GetDefaultQuery(Methods.enrol_manual_enrol_users));
             query.Append(
-                "webservice/rest/server.php?" +
-                $"wstoken={apiToken}&" +
-                $"wsfunction={Methods.enrol_manual_enrol_users}&" +
-                $"moodlewsrestformat={Format.json}&" +
-                $"enrolments[0][roleid]={role_id}&" +
-                $"enrolments[0][userid]={user_id}&" +
-                $"enrolments[0][courceid]={cource_id}");
+                $"&enrolments[0][roleid]={role_id}" +
+                $"&enrolments[0][userid]={user_id}" +
+                $"&enrolments[0][courceid]={cource_id}");
             if (timestart != Int32.MinValue) query.Append($"&enrolments[0][timestart]={timestart}");
             if (timeend != Int32.MinValue) query.Append($"&enrolments[0][timeend]={timeend}");
             if (suspend != Int32.MinValue) query.Append($"&enrolments[0][suspend]={suspend}");
@@ -456,13 +422,10 @@ namespace MoodleApiWrapper
         public Task<ApiResponse<Success>> AddGroupMember(int group_id, int user_id, CancellationToken cancellationToken = default)
         {
             StringBuilder query = new();
+            query.Append(GetDefaultQuery(Methods.core_group_add_group_members));
             query.Append(
-                "webservice/rest/server.php?" +
-                $"wstoken={apiToken}&" +
-                $"wsfunction={Methods.core_group_add_group_members}&" +
-                $"moodlewsrestformat={Format.json}&" +
-                $"members[0][groupid]={group_id}&" +
-                $"members[0][userid]={user_id}");
+                $"&members[0][groupid]={group_id}" +
+                $"&members[0][userid]={user_id}");
 
             return Get<Success>(query.ToString(), cancellationToken);
         }
@@ -476,13 +439,10 @@ namespace MoodleApiWrapper
         public Task<ApiResponse<Success>> DeleteGroupMember(int group_id, int user_id, CancellationToken cancellationToken = default)
         {
             StringBuilder query = new();
+            query.Append(GetDefaultQuery(Methods.core_group_delete_group_members));
             query.Append(
-                "webservice/rest/server.php?" +
-                $"wstoken={apiToken}&" +
-                $"wsfunction={Methods.core_group_delete_group_members}&" +
-                $"moodlewsrestformat={Format.json}&" +
-                $"members[0][groupid]={group_id}&" +
-                $"members[0][userid]={user_id}");
+                $"&members[0][groupid]={group_id}" +
+                $"&members[0][userid]={user_id}");
 
             return Get<Success>(query.ToString(), cancellationToken);
         }
@@ -506,13 +466,10 @@ namespace MoodleApiWrapper
         public Task<ApiResponse<Category>> GetCategories(string criteria_key, string criteria_value, int addSubCategories = 1, CancellationToken cancellationToken = default)
         {
             StringBuilder query = new();
+            query.Append(GetDefaultQuery(Methods.core_course_get_categories));
             query.Append(
-                "webservice/rest/server.php?" +
-                $"wstoken={apiToken}&" +
-                $"wsfunction={Methods.core_course_get_categories}&" +
-                $"moodlewsrestformat={Format.json}&" +
-                $"criteria[0][key]={criteria_key}&" +
-                $"criteria[0][value]={criteria_value}");
+                $"&criteria[0][key]={criteria_key}" +
+                $"&criteria[0][value]={criteria_value}");
 
             if (addSubCategories != 1) query.Append($"&addsubcategories={addSubCategories}");
 
@@ -527,11 +484,8 @@ namespace MoodleApiWrapper
         public Task<ApiResponse<Course>> GetCourses(int options = int.MinValue, CancellationToken cancellationToken = default)
         {
             StringBuilder query = new();
-            query.Append(
-                "webservice/rest/server.php?" +
-                $"wstoken={apiToken}&" +
-                $"wsfunction={Methods.core_course_get_courses}&" +
-                $"moodlewsrestformat={Format.json}");
+            query.Append(GetDefaultQuery(Methods.core_course_get_courses));
+
             if (options != int.MinValue) query.Append($"&addsubcategories={options}");
 
             return Get<Course>(query.ToString(), cancellationToken);
@@ -545,12 +499,8 @@ namespace MoodleApiWrapper
         public Task<ApiResponse<Content>> GetContents(int course_id, CancellationToken cancellationToken = default)
         {
             StringBuilder query = new();
-            query.Append(
-                "webservice/rest/server.php?" +
-                $"wstoken={apiToken}&" +
-                $"wsfunction={Methods.core_course_get_contents}&" +
-                $"moodlewsrestformat={Format.json}&" +
-                $"courseid={course_id}");
+            query.Append(GetDefaultQuery(Methods.core_course_get_contents));
+            query.Append($"&courseid={course_id}");
 
             return Get<Content>(query.ToString(), cancellationToken);
         }
@@ -563,12 +513,8 @@ namespace MoodleApiWrapper
         public Task<ApiResponse<Group>> GetGroup(int group_id, CancellationToken cancellationToken = default)
         {
             StringBuilder query = new();
-            query.Append(
-                "webservice/rest/server.php?" +
-                $"wstoken={apiToken}&" +
-                $"wsfunction={Methods.core_group_get_groups}&" +
-                $"moodlewsrestformat={Format.json}&" +
-                $"groupids[0]={group_id}");
+            query.Append(GetDefaultQuery(Methods.core_group_get_groups));
+            query.Append($"&groupids[0]={group_id}");
 
             return Get<Group>(query.ToString(), cancellationToken);
         }
@@ -581,16 +527,10 @@ namespace MoodleApiWrapper
         public Task<ApiResponse<Group>> GetGroups(int[] group_ids, CancellationToken cancellationToken = default)
         {
             StringBuilder query = new();
-            query.Append(
-                "webservice/rest/server.php?" +
-                $"wstoken={apiToken}&" +
-                $"wsfunction={Methods.core_group_get_groups}&" +
-                $"moodlewsrestformat={Format.json}");
+            query.Append(GetDefaultQuery(Methods.core_group_get_groups));
 
             for (int i = 0; i < group_ids.Length; i++)
-            {
                 query.Append($"&groupids[{i}]={group_ids[i]}");
-            }
 
             return Get<Group>(query.ToString(), cancellationToken);
         }
@@ -603,12 +543,8 @@ namespace MoodleApiWrapper
         public Task<ApiResponse<Group>> GetCourseGroups(int course_id, CancellationToken cancellationToken = default)
         {
             StringBuilder query = new();
-            query.Append(
-                "webservice/rest/server.php?" +
-                $"wstoken={apiToken}&" +
-                $"wsfunction={Methods.core_group_get_course_groups}&" +
-                $"moodlewsrestformat={Format.json}&" +
-                $"courseid={course_id}");
+            query.Append(GetDefaultQuery(Methods.core_group_get_course_groups));
+            query.Append($"&courseid={course_id}");
 
             return Get<Group>(query.ToString(), cancellationToken);
         }
@@ -621,12 +557,8 @@ namespace MoodleApiWrapper
         public Task<ApiResponse<EnrolledUser>> GetEnrolledUsersByCourse(int course_id, CancellationToken cancellationToken = default)
         {
             StringBuilder query = new();
-            query.Append(
-                "webservice/rest/server.php?" +
-                $"wstoken={apiToken}&" +
-                $"wsfunction={Methods.core_enrol_get_enrolled_users}&" +
-                $"moodlewsrestformat={Format.json}&" +
-                $"courseid={course_id}");
+            query.Append(GetDefaultQuery(Methods.core_enrol_get_enrolled_users));
+            query.Append($"&courseid={course_id}");
 
             return Get<EnrolledUser>(query.ToString(), cancellationToken);
         }
@@ -662,14 +594,11 @@ namespace MoodleApiWrapper
         public Task<ApiResponse<NewCourse>> CreateCourse(CourseModel course, CancellationToken cancellationToken = default)
         {
             StringBuilder query = new();
+            query.Append(GetDefaultQuery(Methods.core_course_create_courses));
             query.Append(
-                "webservice/rest/server.php?" +
-                $"wstoken={apiToken}&" +
-                $"wsfunction={Methods.core_course_create_courses}&" +
-                $"moodlewsrestformat={Format.json}&" +
-                $"courses[0][fullname]={course.Fullname}&" +
-                $"courses[0][shortname]={course.Shortname}&" +
-                $"courses[0][categoryid]={course.CategoryId}");
+                $"&courses[0][fullname]={course.Fullname}" +
+                $"&courses[0][shortname]={course.Shortname}" +
+                $"&courses[0][categoryid]={course.CategoryId}");
 
             if (course.idnumber.Any()) query.Append($"&courses[0][idnumber]={course.idnumber}");
             if (course.summary.Any()) query.Append($"&courses[0][summary]={course.summary}");
@@ -704,11 +633,7 @@ namespace MoodleApiWrapper
         public Task<ApiResponse<NewCourse>> CreateCourses(CourseModel[] courses, int[] category_ids = default, CancellationToken cancellationToken = default)
         {
             StringBuilder query = new();
-            query.Append(
-                "webservice/rest/server.php?" +
-                $"wstoken={apiToken}&" +
-                $"wsfunction={Methods.core_course_create_courses}&" +
-                $"moodlewsrestformat={Format.json}");
+            query.Append(GetDefaultQuery(Methods.core_course_create_courses));
 
             for (var i = 0; i < courses.Length; i++)
             {
@@ -731,12 +656,8 @@ namespace MoodleApiWrapper
             string courcCourseformatoption = "" /*not implemented*/, CancellationToken cancellationToken = default)
         {
             StringBuilder query = new();
-            query.Append(
-                "webservice/rest/server.php?" +
-                $"wstoken={apiToken}&" +
-                $"wsfunction={Methods.core_course_update_courses}&" +
-                $"moodlewsrestformat={Format.json}&" +
-                $"courses[0][id]={id}");
+            query.Append(GetDefaultQuery(Methods.core_course_update_courses));
+            query.Append($"&courses[0][id]={id}");
 
             if (fullname.Any()) query.Append($"&courses[0][fullname]={fullname}");
             if (shortname.Any()) query.Append($"&courses[0][shortname]={shortname}");
@@ -774,12 +695,9 @@ namespace MoodleApiWrapper
         public Task<ApiResponse<Category>> GetGrades(int courseid, string component = "", int activityid = Int32.MaxValue, string[] userids = null, CancellationToken cancellationToken = default)
         {
             StringBuilder query = new();
-            query.Append(
-                "webservice/rest/server.php?" +
-                $"wstoken={apiToken}&" +
-                $"wsfunction={Methods.core_grades_get_grades}&" +
-                $"moodlewsrestformat={Format.json}&" +
-                $"courseid={courseid}");
+            query.Append(GetDefaultQuery(Methods.core_grades_get_grades));
+
+            query.Append($"&courseid={courseid}");
 
             if (component.Any()) query.Append($"&component={component}");
             if (activityid != int.MaxValue) query.Append($"&activityid={activityid}");
@@ -799,11 +717,7 @@ namespace MoodleApiWrapper
         public Task<ApiResponse<Events>> GetCalanderEvents(int[] groupids = default, int[] courseids = default, int[] eventids = default, CancellationToken cancellationToken = default)
         {
             StringBuilder query = new();
-            query.Append(
-                "webservice/rest/server.php?" +
-                $"wstoken={apiToken}&" +
-                $"wsfunction={Methods.core_calendar_get_calendar_events}&" +
-                $"moodlewsrestformat={Format.json}");
+            query.Append(GetDefaultQuery(Methods.core_calendar_get_calendar_events));
 
             if (groupids != null)
                 for (int i = 0; i < groupids.Length; i++)
@@ -841,11 +755,7 @@ namespace MoodleApiWrapper
             int[] visible = default, int[] sequences = default, CancellationToken cancellationToken = default)
         {
             StringBuilder query = new();
-            query.Append(
-                "webservice/rest/server.php?" +
-                $"wstoken={apiToken}&" +
-                $"wsfunction={Methods.core_calendar_create_calendar_events}&" +
-                $"moodlewsrestformat={Format.json}");
+            query.Append(GetDefaultQuery(Methods.core_calendar_create_calendar_events));
 
             for (int i = 0; i < names.Length; i++)
                 query.Append($"&events[{i}][name]={names[i]}");
@@ -899,11 +809,7 @@ namespace MoodleApiWrapper
         public Task<ApiResponse<Events>> DeleteCalanderEvents(int[] eventids, int[] repeats, string[] descriptions = default, CancellationToken cancellationToken = default)
         {
             StringBuilder query = new();
-            query.Append(
-                "webservice/rest/server.php?" +
-                $"wstoken={apiToken}&" +
-                $"wsfunction={Methods.core_calendar_delete_calendar_events}&" +
-                $"moodlewsrestformat={Format.json}");
+            query.Append(GetDefaultQuery(Methods.core_calendar_delete_calendar_events));
 
             if (repeats != null)
                 for (int i = 0; i < repeats.Length; i++)
@@ -931,15 +837,11 @@ namespace MoodleApiWrapper
         /// <param name="enrolmentkeys"></param>
         /// <param name="idnumbers"></param>
         /// <returns></returns>
-        public Task<ApiResponse<Events>> CreateGroups(string[] names = default, int[] courseids = default, string[] descriptions = default,
+        public Task<ApiResponse<Group>> CreateGroups(string[] names = default, int[] courseids = default, string[] descriptions = default,
             int[] descriptionformats = default, string[] enrolmentkeys = default, string[] idnumbers = default, CancellationToken cancellationToken = default)
         {
             StringBuilder query = new();
-            query.Append(
-                "webservice/rest/server.php?" +
-                $"wstoken={apiToken}&" +
-                $"wsfunction=core_group_create_groups&" +
-                $"moodlewsrestformat={Format.json}");
+            query.Append(GetDefaultQuery(Methods.core_group_create_groups));
 
             if (names != null)
                 for (int i = 0; i < names.Length; i++)
@@ -965,8 +867,7 @@ namespace MoodleApiWrapper
                 for (int i = 0; i < idnumbers.Length; i++)
                     query.Append($"&groups[{i}][idnumber]={idnumbers[i]}");
 
-
-            return Get<Events>(query.ToString(), cancellationToken);
+            return Get<Group>(query.ToString(), cancellationToken);
         }
 
         /// <summary>
@@ -1031,6 +932,14 @@ namespace MoodleApiWrapper
         {
             GC.SuppressFinalize(this);
             client?.Dispose();
+        }
+
+        private string GetDefaultQuery(Methods method)
+        {
+            return "webservice/rest/server.php?" +
+                $"wstoken={apiToken}&" +
+                $"wsfunction={method}&" +
+                $"moodlewsrestformat={Format.json}";
         }
     }
 }
