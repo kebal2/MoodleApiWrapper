@@ -4,22 +4,22 @@ using Newtonsoft.Json;
 
 namespace Console
 {
-    public static class ApiWrapperExtensions
+    public static class CourseGenerator
     {
-        public static async Task CreateCourses(this ApiWrapper moodleApiWrapper, int courseCount, int batchSize = 5)
+        public static async Task CreateCourses(this MoodleApi moodleMoodleApi, int courseCount, int batchSize = 5)
         {
-            var courses = new List<CourseModel>(
+            var courses = new List<CourseCreate>(
             Enumerable.Range(0, courseCount).Select(i =>
             {
                 var courseFullName = LoremNET.Lorem.Words(10);
                 var courseShortName = courseFullName.Replace(" ", String.Empty);
 
-                return new CourseModel(courseFullName, courseShortName, 1);
+                return new CourseCreate(courseFullName, courseShortName, 1);
             }));
 
             for (int i = 0; i < courses.Count; i += batchSize)
             {
-                var result = await moodleApiWrapper.CreateCourses(courses.Skip(i).Take(batchSize).ToArray());
+                var result = await moodleMoodleApi.CreateCourses(courses.Skip(i).Take(batchSize).ToArray());
 
                 var res = JsonConvert.SerializeObject(result);
 
@@ -27,15 +27,15 @@ namespace Console
             }
         }
 
-        public static async Task DeleteCourses(this ApiWrapper moodleApiWrapper, int batchSize = 15)
+        public static async Task DeleteCourses(this MoodleApi moodleMoodleApi, int batchSize = 15)
         {
-            var getCourses = await moodleApiWrapper.GetCourses();
+            var getCourses = await moodleMoodleApi.GetCourses();
 
-            var courseAzonositok = getCourses.DataArray.Select(c => c.id).ToArray();
+            var courseIds = getCourses.DataArray.Select(c => c.id).ToArray();
 
-            for (int i = 0; i < courseAzonositok.Length; i += batchSize)
+            for (int i = 0; i < courseIds.Length; i += batchSize)
             {
-                var result = await moodleApiWrapper.DeleteCourses(courseAzonositok.Skip(i).Take(batchSize).ToArray());
+                var result = await moodleMoodleApi.DeleteCourses(courseIds.Skip(i).Take(batchSize).ToArray());
 
                 var res = JsonConvert.SerializeObject(result);
 
