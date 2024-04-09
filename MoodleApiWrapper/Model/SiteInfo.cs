@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 
+using MoodleApiWrapper.Model;
+
 using Newtonsoft.Json;
 
 namespace MoodleApiWrapper;
@@ -8,7 +10,7 @@ namespace MoodleApiWrapper;
 /// <summary>
 /// Represents the data associated to the site information
 /// </summary>
-public class Site_info : ICloneable, IDataModel
+public class SiteInfo : ICloneable, IDataModel
 {
     public string sitename { get; set; }
     public string username { get; set; }
@@ -37,7 +39,7 @@ public class Site_info : ICloneable, IDataModel
     }
 
     [JsonConstructor]
-    internal Site_info(string sitename, string username, string firstname, string lastname, string fullname,
+    internal SiteInfo(string sitename, string username, string firstname, string lastname, string fullname,
         string lang, int userid, string siteurl, string userpictureurl, List<Function> functions, int downloadfiles,
         int uploadfiles, string release, string version, string mobilcssurl, List<Advancedfeature> advancedfeatures,
         bool usercanmanageownfiles, int userquota, int usermaxuploadfilesize, int userhomepage)
