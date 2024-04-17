@@ -60,8 +60,8 @@ public class MoodleApi
 
     public Task<ApiResponse<Course>> GetCourses(int options = int.MinValue, CancellationToken cancellationToken = default) => Get<Course>(mrb.GetCourses(options), cancellationToken);
 
-    public Task<ApiResponse<Course>> GetCourses(int? id = null, int[] ids = null, string? shortname = null, string? idnumber = null, int? category = null, CancellationToken cancellationToken = default) =>
-        Get<Course>(mrb.GetCourses(id, ids, shortname, idnumber, category), cancellationToken);
+    public Task<ApiResponse<GetCourseResult>> GetCourses(int? id = null, int[] ids = null, string? shortname = null, string? idnumber = null, int? category = null, CancellationToken cancellationToken = default) =>
+        Get<GetCourseResult>(mrb.GetCourses(id, ids, shortname, idnumber, category), cancellationToken);
 
     public Task<ApiResponse<Content>> GetContents(int courseId, CancellationToken cancellationToken = default) => Get<Content>(mrb.GetContents(courseId), cancellationToken);
 
