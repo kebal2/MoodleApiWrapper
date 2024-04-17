@@ -9,7 +9,7 @@ public class ApiResponse<T> where T : IDataModel
     /// <summary>
     /// Gets the API response data.
     /// </summary>
-    public string Status { get; private set; }
+    public bool SuccessfulCall { get; private set; }
 
     public T[] DataArray { get; private set; }
 
@@ -22,16 +22,13 @@ public class ApiResponse<T> where T : IDataModel
     public string RequestedPath { get; set; }
     internal ApiResponse(ApiResponseRaw rawResponse)
     {
-        this.Error = rawResponse.Error.ToObject<Error>();
+        Error = rawResponse.Error.ToObject<Error>();
 
-        if (Error.errorcode == null && Error.exception == null && Error.message == null)
-            Status = "Succesful";
-        else
-            Status = "Failed";
+        SuccessfulCall = Error.errorcode == null && Error.exception == null && Error.message == null;
 
         if (null != rawResponse.DataArray)
-            this.DataArray = rawResponse.DataArray.ToObject<T[]>();
+            DataArray = rawResponse.DataArray.ToObject<T[]>();
         else
-            this.Data = rawResponse.Data.ToObject<T>();
+            Data = rawResponse.Data.ToObject<T>();
     }
 }
