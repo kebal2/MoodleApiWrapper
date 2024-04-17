@@ -201,6 +201,57 @@ public class MoodleRequestBuilder
         });
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="id">course id</param>
+    /// <param name="ids">comma separated course ids</param>
+    /// <param name="shortname"> course short name</param>
+    /// <param name="idnumber">course id number</param>
+    /// <param name="category">category id the course belongs to</param>
+    /// <returns></returns>
+    public string GetCourses(int? id, int[] ids, string? shortname, string? idnumber, int? category)
+    {
+        return GetUriFor(Methods.core_course_get_courses_by_field, q =>
+        {
+            int i = 0;
+            if (id != null)
+            {
+                q[$"fields[{i}][key]"] = nameof(id);
+                q[$"fields[{i}][value]"] = id.ToString();
+                i++;
+            }
+
+            if (ids != null)
+            {
+                q[$"fields[{i}][key]"] = nameof(ids);
+                q[$"fields[{i}][value]"] = string.Join(",", ids);
+                i++;
+            }
+
+            if (shortname != null)
+            {
+                q[$"fields[{i}][key]"] = nameof(shortname);
+                q[$"fields[{i}][value]"] = shortname;
+                i++;
+            }
+
+            if (idnumber != null)
+            {
+                q[$"fields[{i}][key]"] = nameof(idnumber);
+                q[$"fields[{i}][value]"] = idnumber;
+                i++;
+            }
+
+            if (category != null)
+            {
+                q[$"fields[{i}][key]"] = nameof(category);
+                q[$"fields[{i}][value]"] = category.ToString();
+                i++;
+            }
+        });
+    }
+
     public string GetContents(int courseId)
     {
         return GetUriFor(Methods.core_course_get_contents, q => q["courseid"] = courseId.ToString());

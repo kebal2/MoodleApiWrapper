@@ -60,6 +60,9 @@ public class MoodleApi
 
     public Task<ApiResponse<Course>> GetCourses(int options = int.MinValue, CancellationToken cancellationToken = default) => Get<Course>(mrb.GetCourses(options), cancellationToken);
 
+    public Task<ApiResponse<Course>> GetCourses(int? id = null, int[] ids = null, string? shortname = null, string? idnumber = null, int? category = null, CancellationToken cancellationToken = default) =>
+        Get<Course>(mrb.GetCourses(id, ids, shortname, idnumber, category), cancellationToken);
+
     public Task<ApiResponse<Content>> GetContents(int courseId, CancellationToken cancellationToken = default) => Get<Content>(mrb.GetContents(courseId), cancellationToken);
 
     public Task<ApiResponse<Group>> GetGroup(int groupId, CancellationToken cancellationToken = default) => Get<Group>(mrb.GetGroup(groupId), cancellationToken);
@@ -90,7 +93,8 @@ public class MoodleApi
             eventTypes, timeStarts, timeDurations,
             visible, sequences), cancellationToken);
 
-    public Task<ApiResponse<Events>> DeleteCalendarEvents(int[] eventIds, int[] repeats, string[] descriptions = default, CancellationToken cancellationToken = default) => Get<Events>(mrb.DeleteCalendarEvents(eventIds, repeats, descriptions), cancellationToken);
+    public Task<ApiResponse<Events>> DeleteCalendarEvents(int[] eventIds, int[] repeats, string[] descriptions = default, CancellationToken cancellationToken = default) =>
+        Get<Events>(mrb.DeleteCalendarEvents(eventIds, repeats, descriptions), cancellationToken);
 
     public Task<ApiResponse<Group>> CreateGroups(string[] names = default, int[] courseIds = default, string[] descriptions = default,
         int[] descriptionFormats = default, string[] enrolmentKeys = default, string[] idNumbers = default, CancellationToken cancellationToken = default) =>
