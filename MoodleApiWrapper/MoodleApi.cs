@@ -5,22 +5,21 @@ using System.Net.Http;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-
 using MoodleApiWrapper.ApiResources;
 using MoodleApiWrapper.Model;
-
 using Newtonsoft.Json.Linq;
 
 namespace MoodleApiWrapper;
 
+//TODO: interface
 public class MoodleApi
 {
-    private readonly HttpClient client;
+    private readonly IHttpClientFactory clientFactory;
     private readonly MoodleRequestBuilder mrb;
 
-    public MoodleApi(HttpClient client, MoodleRequestBuilder mrb)
+    public MoodleApi(IHttpClientFactory clientFactory, MoodleRequestBuilder mrb)
     {
-        this.client = client;
+        this.clientFactory = clientFactory;
         this.mrb = mrb;
     }
 
@@ -101,6 +100,8 @@ public class MoodleApi
     {
         try
         {
+            using var client = clientFactory.CreateClient();
+
             using var response = await client.GetAsync(uri, cancellationToken);
 
             var responseStream = await response.Content.ReadAsStringAsync(cancellationToken);
@@ -121,7 +122,9 @@ public class MoodleApi
         if (path.Length > 2000)
             throw new Exception("URI is too long should be split into multiple queries");
 
-        var response = await client.GetAsync(path, cancellationToken);
+        using var client = clientFactory.CreateClient();
+
+        using var response = await client.GetAsync(path, cancellationToken);
 
         if (!response.IsSuccessStatusCode) throw new WebException(await response.Content.ReadAsStringAsync(cancellationToken));
 
