@@ -22,6 +22,7 @@ public class MoodleRequestBuilder
     public MoodleRequestBuilder(IOptions<Moodle> options)
     {
         if (string.IsNullOrEmpty(options.Value.ApiToken)) throw new ArgumentNullException(nameof(apiToken));
+        if (string.IsNullOrEmpty(options.Value.Host)) throw new ArgumentNullException(nameof(apiToken));
         apiToken = options.Value.ApiToken;
         host = options.Value.Host;
     }
@@ -214,40 +215,30 @@ public class MoodleRequestBuilder
     {
         return GetUriFor(Methods.core_course_get_courses_by_field, q =>
         {
-            int i = 0;
-            if (id != null)
-            {
-                q[$"fields[{i}][key]"] = nameof(id);
-                q[$"fields[{i}][value]"] = id.ToString();
-                i++;
-            }
-
-            if (ids != null)
-            {
-                q[$"fields[{i}][key]"] = nameof(ids);
-                q[$"fields[{i}][value]"] = string.Join(",", ids);
-                i++;
-            }
-
             if (shortname != null)
             {
-                q[$"fields[{i}][key]"] = nameof(shortname);
-                q[$"fields[{i}][value]"] = shortname;
-                i++;
+                q["field"] = nameof(shortname);
+                q["value"] = shortname;
             }
-
-            if (idnumber != null)
+            else if (id != null)
             {
-                q[$"fields[{i}][key]"] = nameof(idnumber);
-                q[$"fields[{i}][value]"] = idnumber;
-                i++;
+                q["field"] = nameof(id);
+                q["value"] = id.ToString();
             }
-
-            if (category != null)
+            else if (ids != null)
             {
-                q[$"fields[{i}][key]"] = nameof(category);
-                q[$"fields[{i}][value]"] = category.ToString();
-                i++;
+                q["field"] = nameof(ids);
+                q["value"] = string.Join(",", ids);
+            }
+            else if (idnumber != null)
+            {
+                q["field"] = nameof(idnumber);
+                q["value"] = idnumber;
+            }
+            else if (category != null)
+            {
+                q["field"] = nameof(category);
+                q["value"] = category.ToString();
             }
         });
     }
@@ -473,7 +464,7 @@ public class MoodleRequestBuilder
 
     private string GetUriFor(Methods method, Action<NameValueCollection> queryCallback, Format format = Format.json)
     {
-        var uriBuilder = new UriBuilder(host);
+        var uriBuilder = new UriBuilder(host.TrimEnd('/'));
         uriBuilder.Path += WebserviceEndpoint;
 
         var query = HttpUtility.ParseQueryString(uriBuilder.Query);
