@@ -4,19 +4,13 @@ namespace MoodleApiWrapper;
 
 internal class ApiResponseRaw
 {
-    public ApiResponseRaw(JObject data)
+    public ApiResponseRaw(JContainer data)
     {
         Data = data;
-        Error = data;
+
+        Error = data as JObject ?? new JObject();
     }
 
-    public ApiResponseRaw(JArray data)
-    {
-        DataArray = data;
-        Error = new JObject();
-    }
-
-    internal JArray DataArray { get; set; }
-    internal JObject Data { get; set; }
+    internal JContainer Data { get; set; }
     internal JObject Error { get; set; }
 }
