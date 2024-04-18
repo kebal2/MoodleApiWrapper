@@ -96,23 +96,23 @@ public class MoodleRequestBuilder
     private void UserDataQueryBuilder(UserOptionalProperties userOptionalProperties, NameValueCollection query)
     {
         if (!string.IsNullOrEmpty(userOptionalProperties.auth)) query[$"users[0][{nameof(userOptionalProperties.auth)}]"] = userOptionalProperties.auth;
-        if (!string.IsNullOrEmpty(userOptionalProperties.idnumber)) query[$"user[0][{nameof(userOptionalProperties.idnumber)}]"] = userOptionalProperties.idnumber;
-        if (!string.IsNullOrEmpty(userOptionalProperties.lang)) query[$"user[0][{nameof(userOptionalProperties.lang)}]"] = userOptionalProperties.lang;
-        if (!string.IsNullOrEmpty(userOptionalProperties.calendartye)) query[$"user[0][{nameof(userOptionalProperties.calendartye)}]"] = userOptionalProperties.calendartye;
-        if (!string.IsNullOrEmpty(userOptionalProperties.theme)) query[$"user[0][{nameof(userOptionalProperties.theme)}]"] = userOptionalProperties.theme;
-        if (!string.IsNullOrEmpty(userOptionalProperties.timezone)) query[$"user[0][{nameof(userOptionalProperties.timezone)}]"] = userOptionalProperties.timezone;
-        if (!string.IsNullOrEmpty(userOptionalProperties.mailformat)) query[$"user[0][{nameof(userOptionalProperties.mailformat)}]"] = userOptionalProperties.mailformat;
-        if (!string.IsNullOrEmpty(userOptionalProperties.description)) query[$"user[0][{nameof(userOptionalProperties.description)}]"] = userOptionalProperties.description;
-        if (!string.IsNullOrEmpty(userOptionalProperties.city)) query[$"user[0][{nameof(userOptionalProperties.city)}]"] = userOptionalProperties.city;
-        if (!string.IsNullOrEmpty(userOptionalProperties.country)) query[$"user[0][{nameof(userOptionalProperties.country)}]"] = userOptionalProperties.country;
-        if (!string.IsNullOrEmpty(userOptionalProperties.firstnamephonetic)) query[$"user[0][{nameof(userOptionalProperties.firstnamephonetic)}]"] = userOptionalProperties.firstnamephonetic;
-        if (!string.IsNullOrEmpty(userOptionalProperties.lastnamephonetic)) query[$"user[0][{nameof(userOptionalProperties.lastnamephonetic)}]"] = userOptionalProperties.lastnamephonetic;
-        if (!string.IsNullOrEmpty(userOptionalProperties.middlename)) query[$"user[0][{nameof(userOptionalProperties.middlename)}]"] = userOptionalProperties.middlename;
-        if (!string.IsNullOrEmpty(userOptionalProperties.alternatename)) query[$"user[0][{nameof(userOptionalProperties.alternatename)}]"] = userOptionalProperties.alternatename;
-        if (!string.IsNullOrEmpty(userOptionalProperties.preferences_type)) query[$"user[0][{nameof(userOptionalProperties.preferences_type)}]"] = userOptionalProperties.preferences_type;
-        if (!string.IsNullOrEmpty(userOptionalProperties.preferences_value)) query[$"user[0][{nameof(userOptionalProperties.preferences_value)}]"] = userOptionalProperties.preferences_value;
-        if (!string.IsNullOrEmpty(userOptionalProperties.customfields_type)) query[$"user[0][{nameof(userOptionalProperties.customfields_type)}]"] = userOptionalProperties.customfields_type;
-        if (!string.IsNullOrEmpty(userOptionalProperties.customfields_value)) query[$"user[0][{nameof(userOptionalProperties.customfields_value)}]"] = userOptionalProperties.customfields_value;
+        if (!string.IsNullOrEmpty(userOptionalProperties.idnumber)) query[$"users[0][{nameof(userOptionalProperties.idnumber)}]"] = userOptionalProperties.idnumber;
+        if (!string.IsNullOrEmpty(userOptionalProperties.lang)) query[$"users[0][{nameof(userOptionalProperties.lang)}]"] = userOptionalProperties.lang;
+        if (!string.IsNullOrEmpty(userOptionalProperties.calendartye)) query[$"users[0][{nameof(userOptionalProperties.calendartye)}]"] = userOptionalProperties.calendartye;
+        if (!string.IsNullOrEmpty(userOptionalProperties.theme)) query[$"users[0][{nameof(userOptionalProperties.theme)}]"] = userOptionalProperties.theme;
+        if (!string.IsNullOrEmpty(userOptionalProperties.timezone)) query[$"users[0][{nameof(userOptionalProperties.timezone)}]"] = userOptionalProperties.timezone;
+        if (!string.IsNullOrEmpty(userOptionalProperties.mailformat)) query[$"users[0][{nameof(userOptionalProperties.mailformat)}]"] = userOptionalProperties.mailformat;
+        if (!string.IsNullOrEmpty(userOptionalProperties.description)) query[$"users[0][{nameof(userOptionalProperties.description)}]"] = userOptionalProperties.description;
+        if (!string.IsNullOrEmpty(userOptionalProperties.city)) query[$"users[0][{nameof(userOptionalProperties.city)}]"] = userOptionalProperties.city;
+        if (!string.IsNullOrEmpty(userOptionalProperties.country)) query[$"users[0][{nameof(userOptionalProperties.country)}]"] = userOptionalProperties.country;
+        if (!string.IsNullOrEmpty(userOptionalProperties.firstnamephonetic)) query[$"users[0][{nameof(userOptionalProperties.firstnamephonetic)}]"] = userOptionalProperties.firstnamephonetic;
+        if (!string.IsNullOrEmpty(userOptionalProperties.lastnamephonetic)) query[$"users[0][{nameof(userOptionalProperties.lastnamephonetic)}]"] = userOptionalProperties.lastnamephonetic;
+        if (!string.IsNullOrEmpty(userOptionalProperties.middlename)) query[$"users[0][{nameof(userOptionalProperties.middlename)}]"] = userOptionalProperties.middlename;
+        if (!string.IsNullOrEmpty(userOptionalProperties.alternatename)) query[$"users[0][{nameof(userOptionalProperties.alternatename)}]"] = userOptionalProperties.alternatename;
+        if (!string.IsNullOrEmpty(userOptionalProperties.preferences_type)) query[$"users[0][{nameof(userOptionalProperties.preferences_type)}]"] = userOptionalProperties.preferences_type;
+        if (!string.IsNullOrEmpty(userOptionalProperties.preferences_value)) query[$"users[0][{nameof(userOptionalProperties.preferences_value)}]"] = userOptionalProperties.preferences_value;
+        if (!string.IsNullOrEmpty(userOptionalProperties.customfields_type)) query[$"users[0][{nameof(userOptionalProperties.customfields_type)}]"] = userOptionalProperties.customfields_type;
+        if (!string.IsNullOrEmpty(userOptionalProperties.customfields_value)) query[$"users[0][{nameof(userOptionalProperties.customfields_value)}]"] = userOptionalProperties.customfields_value;
     }
 
     public string CreateUser(UserCreate userOptionalProperties)
@@ -121,11 +121,11 @@ public class MoodleRequestBuilder
         {
             UserDataQueryBuilder(userOptionalProperties, query);
 
-            query[$"users[0][{nameof(userOptionalProperties.username)}"] = userOptionalProperties.username;
-            query[$"users[0][{nameof(userOptionalProperties.password)}"] = userOptionalProperties.password;
-            query[$"users[0][{nameof(userOptionalProperties.firstname)}"] = userOptionalProperties.firstname;
-            query[$"users[0][{nameof(userOptionalProperties.lastname)}"] = userOptionalProperties.lastname;
-            query[$"users[0][{nameof(userOptionalProperties.email)}"] = userOptionalProperties.email;
+            query[$"users[0][{nameof(userOptionalProperties.username)}]"] = userOptionalProperties.username;
+            query[$"users[0][{nameof(userOptionalProperties.password)}]"] = userOptionalProperties.password;
+            query[$"users[0][{nameof(userOptionalProperties.firstname)}]"] = userOptionalProperties.firstname;
+            query[$"users[0][{nameof(userOptionalProperties.lastname)}]"] = userOptionalProperties.lastname;
+            query[$"users[0][{nameof(userOptionalProperties.email)}]"] = userOptionalProperties.email;
         });
     }
 
