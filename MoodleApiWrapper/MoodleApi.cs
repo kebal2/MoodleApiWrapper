@@ -38,6 +38,8 @@ public class MoodleApi
 
     public Task<ApiResponse<SiteInfo>> GetSiteInfo(string serviceHostName = "", CancellationToken cancellationToken = default) => Get<SiteInfo>(mrb.GetSiteInfo(serviceHostName), cancellationToken);
     public Task<ApiResponse<Users>> GetUsers(object criteria, CancellationToken cancellationToken = default) => Get<Users>(mrb.GetUsers(criteria), cancellationToken);
+    public Task<ApiResponse<Users>> GetUser(UserFields field, string value, CancellationToken cancellationToken = default) => Get<Users>(mrb.GetUser(field, value), cancellationToken);
+    public Task<ApiResponse<User>> GetUsers(UserFields field, string[] values, CancellationToken cancellationToken = default) => Get<User>(mrb.GetUsers(field, values), cancellationToken);
     public Task<ApiResponse<Cources>> GetUserCourses(int userid, CancellationToken cancellationToken = default) => Get<Cources>(mrb.GetUserCourses(userid), cancellationToken);
     public Task<ApiResponse<NewUser>> CreateUser(UserCreate userOptionalProperties, CancellationToken cancellationToken = default) => Get<NewUser>(mrb.CreateUser(userOptionalProperties), cancellationToken);
     public Task<ApiResponse<Success>> UpdateUser(int id, UserUpdate userOptionalProperties, CancellationToken cancellationToken = default) => Get<Success>(mrb.UpdateUser(id, userOptionalProperties), cancellationToken);

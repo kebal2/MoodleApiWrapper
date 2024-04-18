@@ -66,6 +66,28 @@ public class MoodleRequestBuilder
         });
     }
 
+    public string GetUsers(UserFields field, string[] values)
+    {
+        return GetUriFor(Methods.core_user_get_users_by_field, q =>
+        {
+            q["field"] = field.ToString();
+            int i = 0;
+            foreach (var value in values)
+            {
+                q[$"values[{i++}]"] = value.ToLowerInvariant();
+            }
+        });
+    }
+
+    public string GetUser(UserFields field, string value)
+    {
+        return GetUriFor(Methods.core_user_get_users_by_field, q =>
+        {
+            q["field"] = field.ToString();
+            q["values[]"] = value;
+        });
+    }
+
     public string GetUserCourses(int userid)
     {
         return GetUriFor(Methods.core_enrol_get_users_courses, query => query["userid"] = userid.ToString());

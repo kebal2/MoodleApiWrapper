@@ -5,7 +5,7 @@ using Newtonsoft.Json;
 
 namespace MoodleApiWrapper;
 
-public class User : ICloneable
+public class User : ICloneable, IDataModel
 {
     [JsonConstructor]
     internal User(int id, string username, string firstname, string lastname, string fullname, string email, string department,
