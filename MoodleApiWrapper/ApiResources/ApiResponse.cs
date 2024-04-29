@@ -27,6 +27,12 @@ public class ApiResponse<T>
 
         SuccessfulCall = Error.errorcode == null && Error.exception == null && Error.message == null;
 
+        if (!SuccessfulCall)
+        {
+            Data = default;
+            return;
+        }
+
         try
         {
             Data = rawResponse.Data.ToObject<T>();
@@ -35,9 +41,12 @@ public class ApiResponse<T>
         {
             var a =rawResponse.Data.ToObject<T[]>();
 
-            if (a.Length != 1) throw new InvalidOperationException("Single entry expected, got an array");
+            if (a.Length > 1)
+                throw new InvalidOperationException("Single entry expected, got an array");
 
-            Data = a[0];
+            Data = a.Length == 0
+                ? default
+                : a[0];
         }
     }
 }
