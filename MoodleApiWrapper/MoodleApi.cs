@@ -15,12 +15,12 @@ namespace MoodleApiWrapper;
 //TODO: interface
 public class MoodleApi
 {
-    private readonly IHttpClientFactory clientFactory;
+    private readonly HttpClient client;
     private readonly MoodleRequestBuilder mrb;
 
-    public MoodleApi(IHttpClientFactory clientFactory, MoodleRequestBuilder mrb)
+    public MoodleApi(HttpClient client, MoodleRequestBuilder mrb)
     {
-        this.clientFactory = clientFactory;
+        this.client = client;
         this.mrb = mrb;
     }
 
@@ -52,6 +52,9 @@ public class MoodleApi
     public Task<ApiResponse<Success>> RevokeRoles(int roleId, int userId, string contextId = "", string contextLevel = "", int instanceId = Int32.MinValue, CancellationToken cancellationToken = default) =>
         Get<Success>(mrb.RevokeRoles(roleId, userId, contextId, contextLevel, instanceId), cancellationToken);
 
+
+    /// <param name="timeStart">UnixTimestamp</param>
+    /// <param name="timeEnd">UnixTimestamp</param>
     public Task<ApiResponse<Success>> EnrolUser(int roleId, int userId, int courseId, int timeStart = Int32.MinValue, int timeEnd = Int32.MinValue, int suspend = Int32.MinValue, CancellationToken cancellationToken = default) =>
         Get<Success>(mrb.EnrolUser(roleId, userId, courseId, timeStart, timeEnd, suspend), cancellationToken);
 
@@ -107,8 +110,6 @@ public class MoodleApi
     {
         try
         {
-            using var client = clientFactory.CreateClient();
-
             using var response = await client.GetAsync(uri, cancellationToken);
 
             var responseStream = await response.Content.ReadAsStringAsync(cancellationToken);
@@ -128,8 +129,6 @@ public class MoodleApi
     {
         if (path.Length > 2000)
             throw new Exception("URI is too long should be split into multiple queries");
-
-        using var client = clientFactory.CreateClient();
 
         using var response = await client.GetAsync(path, cancellationToken);
 
