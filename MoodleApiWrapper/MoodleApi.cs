@@ -6,8 +6,10 @@ using System.Net.Http;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+
 using MoodleApiWrapper.ApiResources;
 using MoodleApiWrapper.Model;
+
 using Newtonsoft.Json.Linq;
 
 namespace MoodleApiWrapper;
@@ -51,7 +53,6 @@ public class MoodleApi
 
     public Task<ApiResponse<Success>> RevokeRoles(int roleId, int userId, string contextId = "", string contextLevel = "", int instanceId = Int32.MinValue, CancellationToken cancellationToken = default) =>
         Get<Success>(mrb.RevokeRoles(roleId, userId, contextId, contextLevel, instanceId), cancellationToken);
-
 
     /// <param name="timeStart">UnixTimestamp</param>
     /// <param name="timeEnd">UnixTimestamp</param>
@@ -129,34 +130,46 @@ public class MoodleApi
     {
         if (path.Length > 2000)
             throw new Exception("URI is too long should be split into multiple queries");
-
-        using var response = await client.GetAsync(path, cancellationToken);
-
-        if (!response.IsSuccessStatusCode) throw new WebException(await response.Content.ReadAsStringAsync(cancellationToken));
-
-        var result = await response.Content.ReadAsStringAsync(cancellationToken);
-
-        if (result.ToLower() == "null")
-            result = "{IsSuccessful: true,}";
-
-        ApiResponse<T> rv;
-        JContainer data;
-
         try
         {
-            data = JArray.Parse(result);
-        }
-        catch (Exception ex)
-        {
-            data = JObject.Parse(result);
-        }
+            using var response = await client.GetAsync(path, cancellationToken);
 
-        rv = new ApiResponse<T>(new ApiResponseRaw(data))
-        {
-            RequestedPath = path,
-            ResponseText = result
-        };
+            if (!response.IsSuccessStatusCode) throw new WebException(await response.Content.ReadAsStringAsync(cancellationToken));
 
-        return rv;
+            var result = await response.Content.ReadAsStringAsync(cancellationToken);
+
+            if (result.ToLower() == "null")
+                result = "{IsSuccessful: true,}";
+
+            ApiResponse<T> rv;
+            JContainer data;
+
+            try
+            {
+                data = JArray.Parse(result);
+            }
+            catch (Exception ex)
+            {
+                data = JObject.Parse(result);
+            }
+
+            rv = new ApiResponse<T>(new ApiResponseRaw(data))
+            {
+                RequestedPath = path,
+                ResponseText = result
+            };
+
+            return rv;
+        }
+        catch (HttpRequestException e)
+        {
+            var result = "{ exception: 'HttpRequestException', errorcode: '503', message: '" + e.Message + "' }";
+            var data = JObject.Parse(result);
+            return new ApiResponse<T>(new ApiResponseRaw(data))
+            {
+                RequestedPath = path,
+                ResponseText = result
+            };
+        }
     }
 }
