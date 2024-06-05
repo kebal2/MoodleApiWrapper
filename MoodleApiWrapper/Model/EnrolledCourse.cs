@@ -4,10 +4,10 @@ using Newtonsoft.Json;
 
 namespace MoodleApiWrapper;
 
-public class Enrolledcours : ICloneable
+public class EnrolledCourse : ICloneable
 {
     [JsonConstructor]
-    internal Enrolledcours(int id, string fullname, string shortname)
+    internal EnrolledCourse(int id, string fullname, string shortname)
     {
         this.id = id;
         this.fullname = fullname;

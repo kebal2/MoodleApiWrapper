@@ -9,7 +9,7 @@ public class EnrolledUser : IDataModel, ICloneable
 {
     [JsonConstructor]
     internal EnrolledUser(int id, string username, string firstname, string lastname, string fullname, string email, string department, int firstaccess, int lastaccess, string description, int descriptionformat, string city,
-        string country, string profileimageurlsmall, string profileimageurl, List<Group> groups, List<Role> roles, List<Enrolledcours> enrolledcourses, List<Preference> preferences)
+        string country, string profileimageurlsmall, string profileimageurl, List<Group> groups, List<Role> roles, List<EnrolledCourse> enrolledcourses, List<Preference> preferences)
     {
         this.id = id;
         this.username = username;
@@ -49,7 +49,7 @@ public class EnrolledUser : IDataModel, ICloneable
     public string profileimageurl { get; set; }
     public List<Group> groups { get; set; }
     public List<Role> roles { get; set; }
-    public List<Enrolledcours> enrolledcourses { get; set; }
+    public List<EnrolledCourse> enrolledcourses { get; set; }
     public List<Preference> preferences { get; set; }
 
     public object Clone()
