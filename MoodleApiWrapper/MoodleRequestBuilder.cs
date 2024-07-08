@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Globalization;
 using System.Linq;
@@ -9,6 +10,17 @@ using MoodleApiWrapper.Model;
 using MoodleApiWrapper.Options;
 
 namespace MoodleApiWrapper;
+
+internal static class Helpers
+{
+    internal static void AddField(this NameValueCollection query, List<string> list, string name, string value)
+    {
+        if (list == null || !list.Any()) return;
+
+        for (var i = 0; i < list.Count; i++)
+            query[$"users[0][{name}][{i}][{value}]"] = list[i];
+    }
+}
 
 public class MoodleRequestBuilder
 {
@@ -109,13 +121,21 @@ public class MoodleRequestBuilder
         if (!string.IsNullOrEmpty(userOptionalProperties.lastnamephonetic)) query[$"users[0][{nameof(userOptionalProperties.lastnamephonetic)}]"] = userOptionalProperties.lastnamephonetic;
         if (!string.IsNullOrEmpty(userOptionalProperties.middlename)) query[$"users[0][{nameof(userOptionalProperties.middlename)}]"] = userOptionalProperties.middlename;
         if (!string.IsNullOrEmpty(userOptionalProperties.alternatename)) query[$"users[0][{nameof(userOptionalProperties.alternatename)}]"] = userOptionalProperties.alternatename;
-        if (!string.IsNullOrEmpty(userOptionalProperties.preferences_type)) query[$"users[0][{nameof(userOptionalProperties.preferences_type)}]"] = userOptionalProperties.preferences_type;
-        if (!string.IsNullOrEmpty(userOptionalProperties.preferences_value)) query[$"users[0][{nameof(userOptionalProperties.preferences_value)}]"] = userOptionalProperties.preferences_value;
-        if (!string.IsNullOrEmpty(userOptionalProperties.customfields_type)) query[$"users[0][{nameof(userOptionalProperties.customfields_type)}]"] = userOptionalProperties.customfields_type;
-        if (!string.IsNullOrEmpty(userOptionalProperties.customfields_value)) query[$"users[0][{nameof(userOptionalProperties.customfields_value)}]"] = userOptionalProperties.customfields_value;
+
+        if (!string.IsNullOrEmpty(userOptionalProperties.institution)) query[$"users[0][{nameof(userOptionalProperties.institution)}]"] = userOptionalProperties.institution;
+        if (!string.IsNullOrEmpty(userOptionalProperties.department)) query[$"users[0][{nameof(userOptionalProperties.department)}]"] = userOptionalProperties.department;
+        if (!string.IsNullOrEmpty(userOptionalProperties.phone1)) query[$"users[0][{nameof(userOptionalProperties.phone1)}]"] = userOptionalProperties.phone1;
+        if (!string.IsNullOrEmpty(userOptionalProperties.phone2)) query[$"users[0][{nameof(userOptionalProperties.phone2)}]"] = userOptionalProperties.phone2;
+        if (!string.IsNullOrEmpty(userOptionalProperties.address)) query[$"users[0][{nameof(userOptionalProperties.address)}]"] = userOptionalProperties.address;
+
+        query.AddField(userOptionalProperties.preferences_type, "preferences", "type");
+        query.AddField(userOptionalProperties.preferences_value, "preferences", "value");
+        query.AddField(userOptionalProperties.customfields_type, "customfields", "type");
+        query.AddField(userOptionalProperties.customfields_value, "customfields", "value");
     }
 
-    public string CreateUser(UserCreate userOptionalProperties)
+
+    public string CreateUser(UserData userOptionalProperties)
     {
         return GetUriFor(Methods.core_user_create_users, query =>
         {
@@ -129,7 +149,7 @@ public class MoodleRequestBuilder
         });
     }
 
-    public string UpdateUser(int id, UserUpdate userOptionalProperties)
+    public string UpdateUser(int id, UserData userOptionalProperties)
     {
         return GetUriFor(Methods.core_user_update_users, query =>
         {
@@ -137,7 +157,7 @@ public class MoodleRequestBuilder
             UserDataQueryBuilder(userOptionalProperties, query);
 
             if (!string.IsNullOrEmpty(userOptionalProperties.username)) query[$"users[0][{nameof(userOptionalProperties.username)}]"] = userOptionalProperties.username;
-            if (!string.IsNullOrEmpty(userOptionalProperties.password)) query[$"users[0][{nameof(userOptionalProperties.password)}]"] = userOptionalProperties.password;
+            // if (!string.IsNullOrEmpty(userOptionalProperties.password)) query[$"users[0][{nameof(userOptionalProperties.password)}]"] = userOptionalProperties.password;
             if (!string.IsNullOrEmpty(userOptionalProperties.firstname)) query[$"users[0][{nameof(userOptionalProperties.firstname)}]"] = userOptionalProperties.firstname;
             if (!string.IsNullOrEmpty(userOptionalProperties.lastname)) query[$"users[0][{nameof(userOptionalProperties.lastname)}]"] = userOptionalProperties.lastname;
             if (!string.IsNullOrEmpty(userOptionalProperties.email)) query[$"users[0][{nameof(userOptionalProperties.email)}]"] = userOptionalProperties.email;

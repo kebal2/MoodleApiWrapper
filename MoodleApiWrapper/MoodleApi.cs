@@ -44,8 +44,8 @@ public class MoodleApi
     public Task<ApiResponse<User>> GetUser(UserFields field, string value, CancellationToken cancellationToken = default) => Get<User>(mrb.GetUser(field, value), cancellationToken);
     public Task<ApiResponse<User[]>> GetUsers(UserFields field, string[] values, CancellationToken cancellationToken = default) => Get<User[]>(mrb.GetUsers(field, values), cancellationToken);
     public Task<ApiResponse<Cources[]>> GetUserCourses(int userid, CancellationToken cancellationToken = default) => Get<Cources[]>(mrb.GetUserCourses(userid), cancellationToken);
-    public Task<ApiResponse<NewUser>> CreateUser(UserCreate userOptionalProperties, CancellationToken cancellationToken = default) => Get<NewUser>(mrb.CreateUser(userOptionalProperties), cancellationToken);
-    public Task<ApiResponse<Success>> UpdateUser(int id, UserUpdate userOptionalProperties, CancellationToken cancellationToken = default) => Get<Success>(mrb.UpdateUser(id, userOptionalProperties), cancellationToken);
+    public Task<ApiResponse<NewUser>> CreateUser(UserData userOptionalProperties, CancellationToken cancellationToken = default) => Get<NewUser>(mrb.CreateUser(userOptionalProperties), cancellationToken);
+    public Task<ApiResponse<Success>> UpdateUser(int id, UserData userOptionalProperties, CancellationToken cancellationToken = default) => Get<Success>(mrb.UpdateUser(id, userOptionalProperties), cancellationToken);
     public Task<ApiResponse<Success>> DeleteUser(int id, CancellationToken cancellationToken = default) => Get<Success>(mrb.DeleteUser(id), cancellationToken);
 
     public Task<ApiResponse<Success>> AssignRoles(int roleId, int userId, string contextId = "", string contextLevel = "", int instanceId = Int32.MinValue, CancellationToken cancellationToken = default) =>

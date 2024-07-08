@@ -1,4 +1,6 @@
 ﻿#nullable enable
+using System.Collections.Generic;
+
 namespace MoodleApiWrapper.Model;
 
 public abstract class UserOptionalProperties
@@ -17,8 +19,16 @@ public abstract class UserOptionalProperties
     public string? lastnamephonetic { get; set; }
     public string? middlename { get; set; }
     public string? alternatename { get; set; }
-    public string? preferences_type { get; set; }
-    public string? preferences_value { get; set; }
-    public string? customfields_type { get; set; }
-    public string? customfields_value { get; set; }
+
+
+    public List<string> preferences_type { get; set; }
+    public List<string> preferences_value { get; set; }
+    public List<string> customfields_type { get; set; }
+    public List<string> customfields_value { get; set; }
+
+    public string? institution { get; set; }
+    public string? department { get; set; }
+    public string? phone1 { get; set; }
+    public string? phone2 { get; set; }
+    public string? address { get; set; }
 }
