@@ -7,12 +7,10 @@ namespace MoodleApiWrapper;
 
 public class User : ICloneable, IDataModel
 {
-
-
     [JsonConstructor]
     internal User(int id, string username, string firstname, string lastname, string fullname, string email, string department,
         int firstaccess, int lastaccess, string description, int descriptionformat, string profileimageurlsmall, string profileimageurl,
-        string country, List<Customfield> customfields, List<Preference> preferences, string auth)
+        string country, List<Customfield> customfields, List<Preference> preferences, string auth, bool suspended)
     {
         this.id = id;
         this.username = username;
@@ -31,6 +29,7 @@ public class User : ICloneable, IDataModel
         this.customfields = customfields;
         this.preferences = preferences;
         this.auth = auth;
+        this.suspended = suspended;
     }
 
     public int id { get; set; }
@@ -42,6 +41,7 @@ public class User : ICloneable, IDataModel
     public string department { get; set; }
     public int firstaccess { get; set; }
     public int lastaccess { get; set; }
+    public bool suspended { get; set; }
     public string description { get; set; }
     public int descriptionformat { get; set; }
     public string profileimageurlsmall { get; set; }

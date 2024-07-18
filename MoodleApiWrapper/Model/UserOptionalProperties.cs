@@ -19,6 +19,7 @@ public abstract class UserOptionalProperties
     public string? lastnamephonetic { get; set; }
     public string? middlename { get; set; }
     public string? alternatename { get; set; }
+    public bool? suspended { get; set; }
 
 
     public List<string> preferences_type { get; set; }
