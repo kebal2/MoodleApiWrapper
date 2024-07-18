@@ -149,6 +149,25 @@ public class MoodleRequestBuilder
         });
     }
 
+    public string EnableUser(int id)
+    {
+        return GetUriFor(Methods.core_user_update_users, query =>
+        {
+            query[$"users[0][{nameof(id)}]"] = id.ToString();
+            query[$"users[0][suspended]"] = "0";
+
+        });
+    }
+
+    public string DisableUser(int id)
+    {
+        return GetUriFor(Methods.core_user_update_users, query =>
+        {
+            query[$"users[0][{nameof(id)}]"] = id.ToString();
+            query[$"users[0][suspended]"] = "1";
+
+        });
+    }
     public string UpdateUser(int id, UserData userOptionalProperties)
     {
         return GetUriFor(Methods.core_user_update_users, query =>
