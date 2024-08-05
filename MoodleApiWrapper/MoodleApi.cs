@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -10,6 +11,7 @@ using System.Threading.Tasks;
 using MoodleApiWrapper.ApiResources;
 using MoodleApiWrapper.Model;
 
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
 namespace MoodleApiWrapper;
@@ -42,7 +44,21 @@ public class MoodleApi
     public Task<ApiResponse<SiteInfo>> GetSiteInfo(string serviceHostName = "", CancellationToken cancellationToken = default) => Get<SiteInfo>(mrb.GetSiteInfo(serviceHostName), cancellationToken);
     public Task<ApiResponse<Users>> GetUsers(object criteria, CancellationToken cancellationToken = default) => Get<Users>(mrb.GetUsers(criteria), cancellationToken);
     public Task<ApiResponse<User>> GetUser(UserFields field, string value, CancellationToken cancellationToken = default) => Get<User>(mrb.GetUser(field, value), cancellationToken);
-    public Task<ApiResponse<User[]>> GetUsers(UserFields field, string[] values, CancellationToken cancellationToken = default) => Get<User[]>(mrb.GetUsers(field, values), cancellationToken);
+
+    public Task<ApiResponse<User[]>> GetUsers(UserFields field, string[] values, CancellationToken cancellationToken = default)
+    {
+        return Get<User[]>(mrb.GetUriFor(Methods.core_user_get_users_by_field, _ => { }), new List<KeyValuePair<string, object>>
+        {
+            new("field", field.ToString()),
+            new("values", values),
+        }, cancellationToken);
+        if (string.Join("", values).Length > 750)
+        {
+        }
+
+        return Get<User[]>(mrb.GetUsers(field, values), cancellationToken);
+    }
+
     public Task<ApiResponse<Cources[]>> GetUserCourses(int userid, CancellationToken cancellationToken = default) => Get<Cources[]>(mrb.GetUserCourses(userid), cancellationToken);
     public Task<ApiResponse<NewUser>> CreateUser(UserData userOptionalProperties, CancellationToken cancellationToken = default) => Get<NewUser>(mrb.CreateUser(userOptionalProperties), cancellationToken);
     public Task<ApiResponse<Success>> UpdateUser(int id, UserData userOptionalProperties, CancellationToken cancellationToken = default) => Get<Success>(mrb.UpdateUser(id, userOptionalProperties), cancellationToken);
@@ -129,6 +145,11 @@ public class MoodleApi
         }
     }
 
+    private const string MEDIA_TYPE = "application/json";
+    private static readonly MediaTypeWithQualityHeaderValue mt = new MediaTypeWithQualityHeaderValue(MEDIA_TYPE);
+    private static readonly StringWithQualityHeaderValue encode = new StringWithQualityHeaderValue("gzip");
+    private const int retryCount = 3;
+
     private async Task<ApiResponse<T>> Get<T>(string path, CancellationToken cancellationToken = default)
     {
         if (path.Length > 2000)
@@ -174,5 +195,60 @@ public class MoodleApi
                 ResponseText = result
             };
         }
+    }
+
+    private async Task<ApiResponse<T>> Get<T>(string path, ICollection<KeyValuePair<string, object>> getData, CancellationToken cancellationToken = default)
+    {
+        using var request = new HttpRequestMessage(HttpMethod.Get, path);
+
+        request.Headers.Accept.Add(mt);
+        request.Headers.AcceptEncoding.Add(encode);
+
+        request.Content = GetPostData(getData);
+
+        HttpResponseMessage response = null;
+
+        int i = 0;
+        while (i++ <= retryCount && response is not { StatusCode: HttpStatusCode.OK })
+        {
+            response = await client.SendAsync(request, cancellationToken).ConfigureAwait(false);
+        }
+
+        if (i > retryCount || response == null) throw new Exception("Failed to get response.");
+
+        // var stream = await response.Content.ReadAsStreamAsync(cancellationToken).ConfigureAwait(false);
+        var result = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
+        response.Dispose();
+
+        if (result.ToLower() == "null")
+            result = "{IsSuccessful: true,}";
+
+        JContainer data;
+
+        try
+        {
+            data = JArray.Parse(result);
+        }
+        catch (Exception ex)
+        {
+            data = JObject.Parse(result);
+        }
+
+        return new ApiResponse<T>(new ApiResponseRaw(data))
+        {
+            RequestedPath = path,
+            ResponseText = result
+        };
+    }
+
+    private static HttpContent GetPostData(ICollection<KeyValuePair<string, object>> valueToPost)
+    {
+        throw new NotImplementedException();
+        var data = new MultipartFormDataContent();
+        foreach (var kvp in valueToPost)
+        {
+        }
+
+        return data;
     }
 }

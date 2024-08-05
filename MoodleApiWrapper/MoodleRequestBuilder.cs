@@ -524,7 +524,7 @@ public class MoodleRequestBuilder
         });
     }
 
-    private string GetUriFor(Methods method, Action<NameValueCollection> queryCallback, Format format = Format.json)
+    internal string GetUriFor(Methods method, Action<NameValueCollection> queryCallback, Format format = Format.json)
     {
         var uriBuilder = new UriBuilder(host.TrimEnd('/'));
         uriBuilder.Path += WebserviceEndpoint;
