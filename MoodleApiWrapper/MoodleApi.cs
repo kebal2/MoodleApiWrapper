@@ -4,6 +4,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Net.Mime;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -199,7 +200,7 @@ public class MoodleApi
 
     private async Task<ApiResponse<T>> Get<T>(string path, ICollection<KeyValuePair<string, object>> getData, CancellationToken cancellationToken = default)
     {
-        using var request = new HttpRequestMessage(HttpMethod.Get, path);
+        using var request = new HttpRequestMessage(HttpMethod.Post, path);
 
         request.Headers.Accept.Add(mt);
         request.Headers.AcceptEncoding.Add(encode);
@@ -243,12 +244,24 @@ public class MoodleApi
 
     private static HttpContent GetPostData(ICollection<KeyValuePair<string, object>> valueToPost)
     {
-        throw new NotImplementedException();
-        var data = new MultipartFormDataContent();
+        var formContent = new MultipartFormDataContent();
+        // throw new NotImplementedException();
         foreach (var kvp in valueToPost)
         {
+            if (kvp.Value is Array)
+            {
+                int i = 0;
+                foreach (var item in (Array)kvp.Value)
+                {
+                    formContent.Add(new StringContent(item.ToString(), Encoding.UTF8, MediaTypeNames.Text.Plain), string.Join("", kvp.Key, $"[{i++}]"));
+                }
+            }
+            else
+            {
+                formContent.Add(new StringContent(kvp.Value.ToString(), Encoding.UTF8, MediaTypeNames.Text.Plain), kvp.Key);
+            }
         }
 
-        return data;
+        return formContent;
     }
 }
