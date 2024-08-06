@@ -8,10 +8,8 @@ using System.Net.Mime;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-
 using MoodleApiWrapper.ApiResources;
 using MoodleApiWrapper.Model;
-
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
@@ -20,11 +18,23 @@ namespace MoodleApiWrapper;
 //TODO: interface
 public class MoodleApi
 {
+    private const int PATH_LIMIT = 2000;
+    private const string MEDIA_TYPE = "application/json";
+
+    private static readonly MediaTypeWithQualityHeaderValue mt = new(MEDIA_TYPE);
+    private static readonly StringWithQualityHeaderValue encode = new("gzip");
+
+    private readonly int retryCount;
     private readonly HttpClient client;
     private readonly MoodleRequestBuilder mrb;
 
-    public MoodleApi(HttpClient client, MoodleRequestBuilder mrb)
+    public MoodleApi(HttpClient client, MoodleRequestBuilder mrb) : this(client, mrb, 3)
     {
+    }
+
+    public MoodleApi(HttpClient client, MoodleRequestBuilder mrb, int retryCount)
+    {
+        this.retryCount = retryCount;
         this.client = client;
         this.mrb = mrb;
     }
@@ -48,16 +58,18 @@ public class MoodleApi
 
     public Task<ApiResponse<User[]>> GetUsers(UserFields field, string[] values, CancellationToken cancellationToken = default)
     {
-        return Get<User[]>(mrb.GetUriFor(Methods.core_user_get_users_by_field, _ => { }), new List<KeyValuePair<string, object>>
+        var path = mrb.GetUsers(field, values);
+
+        if (path.Length > PATH_LIMIT)
         {
-            new("field", field.ToString()),
-            new("values", values),
-        }, cancellationToken);
-        if (string.Join("", values).Length > 750)
-        {
+            return Get<User[]>(mrb.GetUriFor(Methods.core_user_get_users_by_field, _ => { }), new List<KeyValuePair<string, object>>
+            {
+                new("field", field.ToString()),
+                new("values", values),
+            }, cancellationToken);
         }
 
-        return Get<User[]>(mrb.GetUsers(field, values), cancellationToken);
+        return Get<User[]>(path, cancellationToken);
     }
 
     public Task<ApiResponse<Cources[]>> GetUserCourses(int userid, CancellationToken cancellationToken = default) => Get<Cources[]>(mrb.GetUserCourses(userid), cancellationToken);
@@ -146,15 +158,12 @@ public class MoodleApi
         }
     }
 
-    private const string MEDIA_TYPE = "application/json";
-    private static readonly MediaTypeWithQualityHeaderValue mt = new MediaTypeWithQualityHeaderValue(MEDIA_TYPE);
-    private static readonly StringWithQualityHeaderValue encode = new StringWithQualityHeaderValue("gzip");
-    private const int retryCount = 3;
+
 
     private async Task<ApiResponse<T>> Get<T>(string path, CancellationToken cancellationToken = default)
     {
-        if (path.Length > 2000)
-            throw new Exception("URI is too long should be split into multiple queries");
+        if (path.Length > PATH_LIMIT)
+            throw new Exception("URI is too long should be split into multiple queries. Please use the other get method!");
         try
         {
             using var response = await client.GetAsync(path, cancellationToken);
@@ -163,28 +172,7 @@ public class MoodleApi
 
             var result = await response.Content.ReadAsStringAsync(cancellationToken);
 
-            if (result.ToLower() == "null")
-                result = "{IsSuccessful: true,}";
-
-            ApiResponse<T> rv;
-            JContainer data;
-
-            try
-            {
-                data = JArray.Parse(result);
-            }
-            catch (Exception ex)
-            {
-                data = JObject.Parse(result);
-            }
-
-            rv = new ApiResponse<T>(new ApiResponseRaw(data))
-            {
-                RequestedPath = path,
-                ResponseText = result
-            };
-
-            return rv;
+            return ResolveApiResponse<T>(path, result);
         }
         catch (HttpRequestException e)
         {
@@ -209,18 +197,34 @@ public class MoodleApi
 
         HttpResponseMessage response = null;
 
-        int i = 0;
-        while (i++ <= retryCount && response is not { StatusCode: HttpStatusCode.OK })
+        try
         {
-            response = await client.SendAsync(request, cancellationToken).ConfigureAwait(false);
+            var i = 0;
+            while (i++ <= retryCount && response is not { StatusCode: HttpStatusCode.OK })
+            {
+                if (response != null)
+                {
+                    Thread.Sleep(1000 * i);
+                    response.Dispose();
+                }
+
+                response = await client.SendAsync(request, cancellationToken).ConfigureAwait(false);
+            }
+
+            if (i > retryCount || response == null) throw new Exception("Failed to get response.");
+
+            var result = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
+
+            return ResolveApiResponse<T>(path, result);
         }
+        finally
+        {
+            response?.Dispose();
+        }
+    }
 
-        if (i > retryCount || response == null) throw new Exception("Failed to get response.");
-
-        // var stream = await response.Content.ReadAsStreamAsync(cancellationToken).ConfigureAwait(false);
-        var result = await response.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
-        response.Dispose();
-
+    private static ApiResponse<T> ResolveApiResponse<T>(string path, string result)
+    {
         if (result.ToLower() == "null")
             result = "{IsSuccessful: true,}";
 
@@ -230,7 +234,7 @@ public class MoodleApi
         {
             data = JArray.Parse(result);
         }
-        catch (Exception ex)
+        catch (Exception)
         {
             data = JObject.Parse(result);
         }
