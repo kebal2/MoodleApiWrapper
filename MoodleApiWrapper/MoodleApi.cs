@@ -8,10 +8,12 @@ using System.Net.Mime;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using MoodleApiWrapper.ApiResources;
 using MoodleApiWrapper.Model;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using Serilog;
 
 namespace MoodleApiWrapper;
 
@@ -166,11 +168,14 @@ public class MoodleApi
             throw new Exception("URI is too long should be split into multiple queries. Please use the other get method!");
         try
         {
+
             using var response = await client.GetAsync(path, cancellationToken);
 
             if (!response.IsSuccessStatusCode) throw new WebException(await response.Content.ReadAsStringAsync(cancellationToken));
 
             var result = await response.Content.ReadAsStringAsync(cancellationToken);
+
+            Log.Debug("Requesting: {Path}{NL}Receiving: {Result}", path, Environment.NewLine, result);
 
             return ResolveApiResponse<T>(path, result);
         }
