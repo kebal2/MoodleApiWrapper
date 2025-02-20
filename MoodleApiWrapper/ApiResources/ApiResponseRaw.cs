@@ -1,10 +1,13 @@
-﻿using Newtonsoft.Json.Linq;
+﻿using System.Reflection;
+
+using Newtonsoft.Json.Linq;
 
 namespace MoodleApiWrapper;
 
+
 internal class ApiResponseRaw
 {
-    public ApiResponseRaw(JContainer data)
+    internal ApiResponseRaw(JContainer data)
     {
         Data = data;
 

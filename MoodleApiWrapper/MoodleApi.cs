@@ -15,8 +15,7 @@ using Newtonsoft.Json.Linq;
 
 namespace MoodleApiWrapper;
 
-//TODO: interface
-public class MoodleApi
+internal class MoodleApi : IMoodleApi
 {
     private const int PATH_LIMIT = 2000;
     private const string MEDIA_TYPE = "application/json";
