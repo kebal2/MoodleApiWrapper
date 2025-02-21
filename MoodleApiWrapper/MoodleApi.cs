@@ -18,9 +18,8 @@ namespace MoodleApiWrapper;
 internal class MoodleApi : IMoodleApi
 {
     private const int PATH_LIMIT = 2000;
-    private const string MEDIA_TYPE = "application/json";
 
-    private static readonly MediaTypeWithQualityHeaderValue mt = new(MEDIA_TYPE);
+    private static readonly MediaTypeWithQualityHeaderValue mt = new(MediaTypeNames.Application.Json);
     private static readonly StringWithQualityHeaderValue encode = new("gzip");
 
     private readonly int retryCount;
@@ -251,10 +250,10 @@ internal class MoodleApi : IMoodleApi
         // throw new NotImplementedException();
         foreach (var kvp in valueToPost)
         {
-            if (kvp.Value is Array)
+            if (kvp.Value is Array array)
             {
                 int i = 0;
-                foreach (var item in (Array)kvp.Value)
+                foreach (var item in array)
                 {
                     formContent.Add(new StringContent(item.ToString(), Encoding.UTF8, MediaTypeNames.Text.Plain), string.Join("", kvp.Key, $"[{i++}]"));
                 }
