@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Runtime.InteropServices.ComTypes;
+
 using Newtonsoft.Json;
 
 namespace MoodleApiWrapper.ApiResources;
@@ -37,7 +39,7 @@ public class ApiResponse<T>
         {
             Data = rawResponse.Data.ToObject<T>();
         }
-        catch (JsonSerializationException exception)
+        catch (JsonSerializationException)
         {
             var a =rawResponse.Data.ToObject<T[]>();
 

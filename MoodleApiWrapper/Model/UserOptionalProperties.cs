@@ -1,5 +1,6 @@
 ﻿#nullable enable
 using System.Collections.Generic;
+// ReSharper disable InconsistentNaming
 
 namespace MoodleApiWrapper.Model;
 
@@ -22,10 +23,10 @@ public abstract class UserOptionalProperties
     public bool? suspended { get; set; }
 
 
-    public List<string> preferences_type { get; set; }
-    public List<string> preferences_value { get; set; }
-    public List<string> customfields_type { get; set; }
-    public List<string> customfields_value { get; set; }
+    public List<string>? preferences_type { get; set; }
+    public List<string>? preferences_value { get; set; }
+    public List<string>? customfields_type { get; set; }
+    public List<string>? customfields_value { get; set; }
 
     public string? institution { get; set; }
     public string? department { get; set; }

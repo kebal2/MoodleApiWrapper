@@ -3,9 +3,10 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Globalization;
 using System.Linq;
-using System.Text;
 using System.Web;
+
 using Microsoft.Extensions.Options;
+
 using MoodleApiWrapper.Model;
 using MoodleApiWrapper.Options;
 
@@ -156,7 +157,6 @@ public class MoodleRequestBuilder
         {
             query[$"users[0][{nameof(id)}]"] = id.ToString();
             query[$"users[0][suspended]"] = "0";
-
         });
     }
 
@@ -166,9 +166,9 @@ public class MoodleRequestBuilder
         {
             query[$"users[0][{nameof(id)}]"] = id.ToString();
             query[$"users[0][suspended]"] = "1";
-
         });
     }
+
     public string UpdateUser(int id, UserData userOptionalProperties)
     {
         return GetUriFor(Methods.core_user_update_users, query =>
@@ -273,7 +273,7 @@ public class MoodleRequestBuilder
     /// <param name="idnumber">course id number</param>
     /// <param name="category">category id the course belongs to</param>
     /// <returns></returns>
-    public string GetCourses(int? id, int[] ids, string? shortname, string? idnumber, int? category)
+    public string GetCourses(int? id, int[] ids, string shortname, string idnumber, int? category)
     {
         return GetUriFor(Methods.core_course_get_courses_by_field, q =>
         {
@@ -537,7 +537,7 @@ public class MoodleRequestBuilder
 
         queryCallback(query);
 
-        uriBuilder.Query = query.ToString();
+        uriBuilder.Query = query.ToString() ?? string.Empty;
 
         return uriBuilder.ToString();
     }
