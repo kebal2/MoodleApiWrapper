@@ -137,6 +137,16 @@ internal class MoodleApi : IMoodleApi
     public Task<ApiResponse<Events[]>> DeleteCalendarEvents(int[] eventIds, int[] repeats, string[] descriptions = null, CancellationToken cancellationToken = default) =>
         Get<Events[]>(mrb.DeleteCalendarEvents(eventIds, repeats, descriptions), cancellationToken);
 
+    public Task<ApiResponse<Group[]>> CreateGroups(string[] names, int[] courseIds, string[] descriptions, int[] descriptionFormats = null, string[] enrolmentKeys = null, string[] idNumbers = null, int visibility = 0, CancellationToken cancellationToken = default)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task<ApiResponse<bool>> GroupsExists(string groupName, int courseId, CancellationToken cancellationToken = default)
+    {
+        throw new NotImplementedException();
+    }
+
     public Task<ApiResponse<Group[]>> CreateGroups(string[] names = null, int[] courseIds = null, string[] descriptions = null,
         int[] descriptionFormats = null, string[] enrolmentKeys = null, string[] idNumbers = null, CancellationToken cancellationToken = default) =>
         Get<Group[]>(mrb.CreateGroups(names, courseIds, descriptions, descriptionFormats, enrolmentKeys, idNumbers), cancellationToken);

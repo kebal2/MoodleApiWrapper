@@ -39,18 +39,19 @@ public interface IMoodleApi
     Task<ApiResponse<Group>> GetCourseGroups(int courseId, CancellationToken cancellationToken = default);
     Task<ApiResponse<EnrolledUser>> GetEnrolledUsersByCourse(int courseId, CancellationToken cancellationToken = default);
     Task<ApiResponse<NewCourse>> CreateCourse(CourseCreate course, CancellationToken cancellationToken = default);
-    Task<ApiResponse<NewCourse[]>> CreateCourses(CourseCreate[] courses, int[] categoryIds = default, CancellationToken cancellationToken = default);
+    Task<ApiResponse<NewCourse[]>> CreateCourses(CourseCreate[] courses, int[] categoryIds = null, CancellationToken cancellationToken = default);
     Task<ApiResponse<UpdateCourseRoot>> UpdateCourse(int id, CourseUpdate course, CancellationToken cancellationToken = default);
     Task<ApiResponse<Category[]>> GetGrades(int courseId, string component = "", int activityId = Int32.MaxValue, string[] userIds = null, CancellationToken cancellationToken = default);
-    Task<ApiResponse<Events[]>> GetCalendarEvents(int[] groupIds = default, int[] courseIds = default, int[] eventIds = default, CancellationToken cancellationToken = default);
+    Task<ApiResponse<Events[]>> GetCalendarEvents(int[] groupIds = null, int[] courseIds = null, int[] eventIds = null, CancellationToken cancellationToken = default);
 
-    Task<ApiResponse<Events[]>> CreateCalendarEvents(string[] names, string[] descriptions = default,
-        int[] formats = default, int[] groupIds = default, int[] courseIds = default, int[] repeats = default,
-        string[] eventTypes = default, DateTime[] timeStarts = default, TimeSpan[] timeDurations = default,
-        int[] visible = default, int[] sequences = default, CancellationToken cancellationToken = default);
+    Task<ApiResponse<Events[]>> CreateCalendarEvents(string[] names, string[] descriptions = null,
+        int[] formats = null, int[] groupIds = null, int[] courseIds = null, int[] repeats = null,
+        string[] eventTypes = null, DateTime[] timeStarts = null, TimeSpan[] timeDurations = null,
+        int[] visible = null, int[] sequences = null, CancellationToken cancellationToken = default);
 
-    Task<ApiResponse<Events[]>> DeleteCalendarEvents(int[] eventIds, int[] repeats, string[] descriptions = default, CancellationToken cancellationToken = default);
+    Task<ApiResponse<Events[]>> DeleteCalendarEvents(int[] eventIds, int[] repeats, string[] descriptions = null, CancellationToken cancellationToken = default);
 
-    Task<ApiResponse<Group[]>> CreateGroups(string[] names = default, int[] courseIds = default, string[] descriptions = default,
-        int[] descriptionFormats = default, string[] enrolmentKeys = default, string[] idNumbers = default, CancellationToken cancellationToken = default);
+    /// <param name="visibility">0 = Visible to all. 1 = Visible to members. 2 = See own membership. 3 = Membership is hidden. default: 0</param>
+    Task<ApiResponse<Group[]>> CreateGroups(string[] names, int[] courseIds, string[] descriptions, int[] descriptionFormats = null, string[] enrolmentKeys = null, string[] idNumbers = null, int visibility = 0, CancellationToken cancellationToken = default);
+    Task<ApiResponse<bool>> GroupsExists(string groupName, int courseId, CancellationToken cancellationToken = default);
 }
