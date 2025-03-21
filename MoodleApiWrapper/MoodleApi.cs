@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -7,6 +8,7 @@ using System.Net.Mime;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+
 using MoodleApiWrapper.ApiResources;
 using MoodleApiWrapper.Model;
 
@@ -110,7 +112,7 @@ internal class MoodleApi : IMoodleApi
 
     public Task<ApiResponse<Group[]>> GetGroups(int[] groupIds, CancellationToken cancellationToken = default) => Get<Group[]>(mrb.GetGroups(groupIds), cancellationToken);
 
-    public Task<ApiResponse<Group>> GetCourseGroups(int courseId, CancellationToken cancellationToken = default) => Get<Group>(mrb.GetCourseGroups(courseId), cancellationToken);
+    public Task<ApiResponse<Group[]>> GetCourseGroups(int courseId, CancellationToken cancellationToken = default) => Get<Group[]>(mrb.GetCourseGroups(courseId), cancellationToken);
 
     public Task<ApiResponse<EnrolledUser>> GetEnrolledUsersByCourse(int courseId, CancellationToken cancellationToken = default) => Get<EnrolledUser>(mrb.GetEnrolledUsersByCourse(courseId), cancellationToken);
 
@@ -137,18 +139,16 @@ internal class MoodleApi : IMoodleApi
     public Task<ApiResponse<Events[]>> DeleteCalendarEvents(int[] eventIds, int[] repeats, string[] descriptions = null, CancellationToken cancellationToken = default) =>
         Get<Events[]>(mrb.DeleteCalendarEvents(eventIds, repeats, descriptions), cancellationToken);
 
-    public Task<ApiResponse<Group[]>> CreateGroups(string[] names, int[] courseIds, string[] descriptions, int[] descriptionFormats = null, string[] enrolmentKeys = null, string[] idNumbers = null, int visibility = 0, CancellationToken cancellationToken = default)
+    public async Task<Group> GetGroupByName(string groupName, int courseId, CancellationToken cancellationToken = default)
     {
-        throw new NotImplementedException();
+        var courseGroups = await GetCourseGroups(courseId, cancellationToken);
+        return courseGroups.SuccessfulCall && courseGroups.Data?.Length > 0
+            ? courseGroups.Data.SingleOrDefault(g => g.name == groupName)
+            : null;
     }
 
-    public Task<ApiResponse<bool>> GroupsExists(string groupName, int courseId, CancellationToken cancellationToken = default)
-    {
-        throw new NotImplementedException();
-    }
-
-    public Task<ApiResponse<Group[]>> CreateGroups(string[] names = null, int[] courseIds = null, string[] descriptions = null,
-        int[] descriptionFormats = null, string[] enrolmentKeys = null, string[] idNumbers = null, CancellationToken cancellationToken = default) =>
+    public Task<ApiResponse<Group[]>> CreateGroups(string[] names, int[] courseIds, string[] descriptions, int[] descriptionFormats = null, string[] enrolmentKeys = null, string[] idNumbers = null, int visibility = 0,
+        CancellationToken cancellationToken = default) =>
         Get<Group[]>(mrb.CreateGroups(names, courseIds, descriptions, descriptionFormats, enrolmentKeys, idNumbers), cancellationToken);
 
     private async Task<AuthentiactionResponse<T>> GetAuth<T>(string uri, CancellationToken cancellationToken) where T : IDataModel
@@ -169,7 +169,6 @@ internal class MoodleApi : IMoodleApi
             throw new WebException("No internet connection.");
         }
     }
-
 
 
     private async Task<ApiResponse<T>> Get<T>(string path, CancellationToken cancellationToken = default)

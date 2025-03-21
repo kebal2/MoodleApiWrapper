@@ -36,7 +36,7 @@ public interface IMoodleApi
     Task<ApiResponse<Content[]>> GetContents(int courseId, CancellationToken cancellationToken = default);
     Task<ApiResponse<Group>> GetGroup(int groupId, CancellationToken cancellationToken = default);
     Task<ApiResponse<Group[]>> GetGroups(int[] groupIds, CancellationToken cancellationToken = default);
-    Task<ApiResponse<Group>> GetCourseGroups(int courseId, CancellationToken cancellationToken = default);
+    Task<ApiResponse<Group[]>> GetCourseGroups(int courseId, CancellationToken cancellationToken = default);
     Task<ApiResponse<EnrolledUser>> GetEnrolledUsersByCourse(int courseId, CancellationToken cancellationToken = default);
     Task<ApiResponse<NewCourse>> CreateCourse(CourseCreate course, CancellationToken cancellationToken = default);
     Task<ApiResponse<NewCourse[]>> CreateCourses(CourseCreate[] courses, int[] categoryIds = null, CancellationToken cancellationToken = default);
@@ -53,5 +53,5 @@ public interface IMoodleApi
 
     /// <param name="visibility">0 = Visible to all. 1 = Visible to members. 2 = See own membership. 3 = Membership is hidden. default: 0</param>
     Task<ApiResponse<Group[]>> CreateGroups(string[] names, int[] courseIds, string[] descriptions, int[] descriptionFormats = null, string[] enrolmentKeys = null, string[] idNumbers = null, int visibility = 0, CancellationToken cancellationToken = default);
-    Task<ApiResponse<bool>> GroupsExists(string groupName, int courseId, CancellationToken cancellationToken = default);
+    Task<Group?> GetGroupByName(string groupName, int courseId, CancellationToken cancellationToken = default);
 }
