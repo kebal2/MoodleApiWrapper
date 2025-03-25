@@ -49,7 +49,7 @@ public class MoodleRequestBuilder
         });
     }
 
-    public string GetApiToken(string username, string password, string serviceHostName)
+    public static string GetApiToken(string username, string password, string serviceHostName)
     {
         return LoginEndpoint +
                $"?username={username}" +
@@ -106,7 +106,7 @@ public class MoodleRequestBuilder
         return GetUriFor(Methods.core_enrol_get_users_courses, query => query["userid"] = userid.ToString());
     }
 
-    private void UserDataQueryBuilder(UserOptionalProperties userOptionalProperties, NameValueCollection query)
+    private static void UserDataQueryBuilder(UserOptionalProperties userOptionalProperties, NameValueCollection query)
     {
         if (!string.IsNullOrEmpty(userOptionalProperties.auth)) query[$"users[0][{nameof(userOptionalProperties.auth)}]"] = userOptionalProperties.auth;
         if (!string.IsNullOrEmpty(userOptionalProperties.idnumber)) query[$"users[0][{nameof(userOptionalProperties.idnumber)}]"] = userOptionalProperties.idnumber;
@@ -334,7 +334,7 @@ public class MoodleRequestBuilder
         return GetUriFor(Methods.core_enrol_get_enrolled_users, q => q["courseid"] = courseId.ToString());
     }
 
-    private void CourseQueryBuilder(CourseOptionalProperties course, NameValueCollection query)
+    private static void CourseQueryBuilder(CourseOptionalProperties course, NameValueCollection query)
     {
         if (!string.IsNullOrEmpty(course.idnumber)) query[$"courses[0][{nameof(course.idnumber)}]"] = course.idnumber;
         if (!string.IsNullOrEmpty(course.summary)) query[$"courses[0][{nameof(course.summary)}]"] = course.summary;

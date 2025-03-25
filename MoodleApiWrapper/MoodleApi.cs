@@ -52,8 +52,8 @@ internal class MoodleApi : IMoodleApi
     }
 
     public Task<ApiResponse<SiteInfo>> GetSiteInfo(string serviceHostName = "", CancellationToken cancellationToken = default) => Get<SiteInfo>(mrb.GetSiteInfo(serviceHostName), cancellationToken);
-    public Task<ApiResponse<Users>> GetUsers(object criteria, CancellationToken cancellationToken = default) => Get<Users>(mrb.GetUsers(criteria), cancellationToken);
     public Task<ApiResponse<User>> GetUser(UserFields field, string value, CancellationToken cancellationToken = default) => Get<User>(mrb.GetUser(field, value), cancellationToken);
+    public Task<ApiResponse<Users>> GetUsers(object criteria, CancellationToken cancellationToken = default) => Get<Users>(mrb.GetUsers(criteria), cancellationToken);
 
     public Task<ApiResponse<User[]>> GetUsers(UserFields field, string[] values, CancellationToken cancellationToken = default)
     {
