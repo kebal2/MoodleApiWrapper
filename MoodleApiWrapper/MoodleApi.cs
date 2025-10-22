@@ -114,7 +114,7 @@ internal class MoodleApi : IMoodleApi
 
     public Task<ApiResponse<Group[]>> GetCourseGroups(int courseId, CancellationToken cancellationToken = default) => Get<Group[]>(mrb.GetCourseGroups(courseId), cancellationToken);
 
-    public Task<ApiResponse<EnrolledUser>> GetEnrolledUsersByCourse(int courseId, CancellationToken cancellationToken = default) => Get<EnrolledUser>(mrb.GetEnrolledUsersByCourse(courseId), cancellationToken);
+    public Task<ApiResponse<EnrolledUser[]>> GetEnrolledUsersByCourse(int courseId, CancellationToken cancellationToken = default) => Get<EnrolledUser[]>(mrb.GetEnrolledUsersByCourse(courseId), cancellationToken);
 
     public Task<ApiResponse<NewCourse>> CreateCourse(CourseCreate course, CancellationToken cancellationToken = default) => Get<NewCourse>(mrb.CreateCourse(course), cancellationToken);
     public Task<ApiResponse<NewCourse[]>> CreateCourses(CourseCreate[] courses, int[] categoryIds = null, CancellationToken cancellationToken = default) => Get<NewCourse[]>(mrb.CreateCourses(courses, categoryIds), cancellationToken);
