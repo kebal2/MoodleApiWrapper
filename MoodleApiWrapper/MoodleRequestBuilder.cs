@@ -145,8 +145,8 @@ public class MoodleRequestBuilder
 
             query[$"users[0][{nameof(userOptionalProperties.username)}]"] = userOptionalProperties.username;
             query[$"users[0][{nameof(userOptionalProperties.password)}]"] = userOptionalProperties.password;
-            query[$"users[0][{nameof(userOptionalProperties.firstname)}]"] = userOptionalProperties.firstname;
-            query[$"users[0][{nameof(userOptionalProperties.lastname)}]"] = userOptionalProperties.lastname;
+            query[$"users[0][{nameof(userOptionalProperties.firstname)}]"] = string.IsNullOrWhiteSpace(userOptionalProperties.firstname) ? "N/A" : userOptionalProperties.firstname;
+            query[$"users[0][{nameof(userOptionalProperties.lastname)}]"] = string.IsNullOrWhiteSpace(userOptionalProperties.lastname) ? "N/A" : userOptionalProperties.lastname;
             query[$"users[0][{nameof(userOptionalProperties.email)}]"] = userOptionalProperties.email;
         });
     }
