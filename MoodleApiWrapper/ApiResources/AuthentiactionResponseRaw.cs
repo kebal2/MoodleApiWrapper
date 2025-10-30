@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json.Linq;
 
-namespace MoodleApiWrapper;
+namespace MoodleApiWrapper.ApiResources;
 
 internal class AuthentiactionResponseRaw
 {

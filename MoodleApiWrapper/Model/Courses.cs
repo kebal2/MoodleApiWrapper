@@ -2,12 +2,12 @@
 
 using Newtonsoft.Json;
 
-namespace MoodleApiWrapper;
+namespace MoodleApiWrapper.Model;
 
-public class Cources : ICloneable, IDataModel
+public class Courses : ICloneable, IDataModel
 {
     [JsonConstructor]
-    internal Cources(int id, string shortname, string fullname, int enrolledusercount, string idnumber,
+    internal Courses(int id, string shortname, string fullname, int enrolledusercount, string idnumber,
         int visible, string summary, int summaryformat, string format, bool showgrades,
         string lang, bool enablecompletion)
     {

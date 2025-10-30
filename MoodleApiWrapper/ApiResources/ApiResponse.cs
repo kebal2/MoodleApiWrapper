@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Runtime.InteropServices.ComTypes;
 
+using MoodleApiWrapper.Model;
+
 using Newtonsoft.Json;
 
 namespace MoodleApiWrapper.ApiResources;

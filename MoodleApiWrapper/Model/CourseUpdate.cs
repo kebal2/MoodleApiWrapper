@@ -1,5 +1,5 @@
 ﻿#nullable enable
-namespace MoodleApiWrapper;
+namespace MoodleApiWrapper.Model;
 
 public class CourseUpdate : CourseOptionalProperties
 {

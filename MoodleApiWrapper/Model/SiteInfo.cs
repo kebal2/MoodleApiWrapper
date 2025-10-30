@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 
-using MoodleApiWrapper.Model;
-
 using Newtonsoft.Json;
 
-namespace MoodleApiWrapper;
+namespace MoodleApiWrapper.Model;
 
 /// <summary>
 /// Represents the data associated to the site information

@@ -1,4 +1,4 @@
-﻿namespace MoodleApiWrapper;
+﻿namespace MoodleApiWrapper.Model;
 
 public class GetCourseResult : IDataModel
 {

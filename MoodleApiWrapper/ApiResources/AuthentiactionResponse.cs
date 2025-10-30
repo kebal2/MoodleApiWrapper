@@ -1,4 +1,6 @@
-﻿namespace MoodleApiWrapper;
+﻿using MoodleApiWrapper.Model;
+
+namespace MoodleApiWrapper.ApiResources;
 
 public class AuthentiactionResponse<T> where T : IDataModel
 {

@@ -2,7 +2,7 @@
 
 using Newtonsoft.Json;
 
-namespace MoodleApiWrapper;
+namespace MoodleApiWrapper.Model;
 
 public class Group : ICloneable, IDataModel
 {

@@ -1,7 +1,7 @@
 ﻿#nullable enable
 using System;
 
-namespace MoodleApiWrapper;
+namespace MoodleApiWrapper.Model;
 
 public abstract class CourseOptionalProperties
 {

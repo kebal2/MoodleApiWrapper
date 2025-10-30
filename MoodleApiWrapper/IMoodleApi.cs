@@ -15,7 +15,7 @@ public interface IMoodleApi
     Task<ApiResponse<Users>> GetUsers(object criteria, CancellationToken cancellationToken = default);
     Task<ApiResponse<User[]>> GetUsers(UserFields field, string[] values, CancellationToken cancellationToken = default);
     Task<ApiResponse<User>> GetUser(UserFields field, string value, CancellationToken cancellationToken = default);
-    Task<ApiResponse<Cources[]>> GetUserCourses(int userid, CancellationToken cancellationToken = default);
+    Task<ApiResponse<Courses[]>> GetUserCourses(int userid, CancellationToken cancellationToken = default);
     Task<ApiResponse<NewUser>> CreateUser(UserData userOptionalProperties, CancellationToken cancellationToken = default);
     Task<ApiResponse<Success>> UpdateUser(int id, UserData userOptionalProperties, CancellationToken cancellationToken = default);
     Task<ApiResponse<Success>> EnableUser(int id, CancellationToken cancellationToken = default);

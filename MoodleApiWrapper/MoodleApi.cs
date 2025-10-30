@@ -71,7 +71,7 @@ internal class MoodleApi : IMoodleApi
         return Get<User[]>(path, cancellationToken);
     }
 
-    public Task<ApiResponse<Cources[]>> GetUserCourses(int userid, CancellationToken cancellationToken = default) => Get<Cources[]>(mrb.GetUserCourses(userid), cancellationToken);
+    public Task<ApiResponse<Courses[]>> GetUserCourses(int userid, CancellationToken cancellationToken = default) => Get<Courses[]>(mrb.GetUserCourses(userid), cancellationToken);
     public Task<ApiResponse<NewUser>> CreateUser(UserData userOptionalProperties, CancellationToken cancellationToken = default) => Get<NewUser>(mrb.CreateUser(userOptionalProperties), cancellationToken);
     public Task<ApiResponse<Success>> UpdateUser(int id, UserData userOptionalProperties, CancellationToken cancellationToken = default) => Get<Success>(mrb.UpdateUser(id, userOptionalProperties), cancellationToken);
     public Task<ApiResponse<Success>> EnableUser(int id, CancellationToken cancellationToken = default) => Get<Success>(mrb.EnableUser(id), cancellationToken);

@@ -1,8 +1,6 @@
-﻿using System.Reflection;
+﻿using Newtonsoft.Json.Linq;
 
-using Newtonsoft.Json.Linq;
-
-namespace MoodleApiWrapper;
+namespace MoodleApiWrapper.ApiResources;
 
 
 internal class ApiResponseRaw

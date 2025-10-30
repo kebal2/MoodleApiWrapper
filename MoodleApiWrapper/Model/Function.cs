@@ -1,8 +1,8 @@
-﻿using Newtonsoft.Json;
+﻿using System;
 
-using System;
+using Newtonsoft.Json;
 
-namespace MoodleApiWrapper
+namespace MoodleApiWrapper.Model
 {
     public class Function : ICloneable
     {

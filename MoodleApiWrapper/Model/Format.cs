@@ -1,4 +1,4 @@
-﻿namespace MoodleApiWrapper;
+﻿namespace MoodleApiWrapper.Model;
 
 /// <summary>
 /// Represents the format of the response.

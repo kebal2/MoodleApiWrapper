@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace MoodleApiWrapper;
+﻿namespace MoodleApiWrapper.Model;
 
 public class CourseCreate : CourseOptionalProperties
 {
