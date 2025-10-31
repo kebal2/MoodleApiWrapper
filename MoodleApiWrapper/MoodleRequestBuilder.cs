@@ -70,9 +70,18 @@ public class MoodleRequestBuilder
     {
         return GetUriFor(Methods.core_user_get_users, q =>
         {
-            for (var i = 0; i < criteria.GetType().GetFields().Length; i++)
+            var fieldInfos = criteria.GetType().GetFields();
+            for (var i = 0; i < fieldInfos.Length; i++)
             {
-                var field = criteria.GetType().GetFields()[i];
+                var field = fieldInfos[i];
+                q[$"criteria[{i}][key]"] = field.Name;
+                q[$"criteria[{i}][value]"] = field.GetValue(criteria).ToString();
+            }
+
+            var propertyInfos = criteria.GetType().GetProperties();
+            for (var i = 0; i < propertyInfos.Length; i++)
+            {
+                var field = propertyInfos[i];
                 q[$"criteria[{i}][key]"] = field.Name;
                 q[$"criteria[{i}][value]"] = field.GetValue(criteria).ToString();
             }
