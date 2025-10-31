@@ -51,6 +51,18 @@ public class User : ICloneable, IDataModel
     public List<Customfield> customfields { get; set; }
     public List<Preference> preferences { get; set; }
 
+    public string phone1 { get; set; }
+    public string phone2 { get; set; }
+    public string city { get; set; }
+    public string timezone { get; set; }
+    public string lastcourseaccess { get; set; }
+    public string institution { get; set; }
+    public string confirmed { get; set; }
+    public string lang { get; set; }
+    public string theme { get; set; }
+    public string mailformat { get; set; }
+    public string trackforums { get; set; }
+
     public object Clone()
     {
         return this.MemberwiseClone();
