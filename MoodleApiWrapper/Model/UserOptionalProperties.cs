@@ -1,8 +1,16 @@
 ﻿#nullable enable
 using System.Collections.Generic;
+
 // ReSharper disable InconsistentNaming
 
 namespace MoodleApiWrapper.Model;
+
+public enum EmailVisibility
+{
+    Hidden = 0,
+    VisibleToEveryone = 1,
+    VisibleToCourseParticipants = 2
+}
 
 public abstract class UserOptionalProperties
 {
@@ -33,4 +41,6 @@ public abstract class UserOptionalProperties
     public string? phone1 { get; set; }
     public string? phone2 { get; set; }
     public string? address { get; set; }
+
+    public EmailVisibility? maildisplay { get; set; }
 }

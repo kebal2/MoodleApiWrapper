@@ -138,7 +138,7 @@ public class MoodleRequestBuilder
         if (!string.IsNullOrEmpty(userOptionalProperties.phone2)) query[$"users[0][{nameof(userOptionalProperties.phone2)}]"] = userOptionalProperties.phone2;
         if (!string.IsNullOrEmpty(userOptionalProperties.address)) query[$"users[0][{nameof(userOptionalProperties.address)}]"] = userOptionalProperties.address;
         if (userOptionalProperties.suspended.HasValue) query[$"users[0][{nameof(userOptionalProperties.suspended)}]"] = userOptionalProperties.suspended.Value ? "1" : "0";
-
+        if (userOptionalProperties.maildisplay.HasValue) query[$"users[0][{nameof(userOptionalProperties.maildisplay)}]"] = ((int)userOptionalProperties.maildisplay.Value).ToString();
         query.AddField(userOptionalProperties.preferences_type, "preferences", "type");
         query.AddField(userOptionalProperties.preferences_value, "preferences", "value");
         query.AddField(userOptionalProperties.customfields_type, "customfields", "type");
