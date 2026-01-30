@@ -107,6 +107,7 @@ internal class MoodleApi : IMoodleApi
         Get<GetCourseResult>(mrb.GetCourses(id, ids, shortname, idnumber, category), cancellationToken);
 
     public Task<ApiResponse<Content[]>> GetContents(int courseId, CancellationToken cancellationToken = default) => Get<Content[]>(mrb.GetContents(courseId), cancellationToken);
+    public Task<ApiResponse<CourseCompletionStatus>> GetCourseCompletionStatus(int courseId, int userId, CancellationToken cancellationToken = default) => Get<CourseCompletionStatus>(mrb.GetCourseCompletionStatus(courseId, userId), cancellationToken);
 
     public Task<ApiResponse<Group>> GetGroup(int groupId, CancellationToken cancellationToken = default) => Get<Group>(mrb.GetGroup(groupId), cancellationToken);
 

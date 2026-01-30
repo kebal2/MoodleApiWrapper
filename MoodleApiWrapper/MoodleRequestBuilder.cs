@@ -319,6 +319,15 @@ public class MoodleRequestBuilder
         return GetUriFor(Methods.core_course_get_contents, q => q["courseid"] = courseId.ToString());
     }
 
+    public string GetCourseCompletionStatus(int courseId, int userId)
+    {
+        return GetUriFor(Methods.core_completion_get_course_completion_status, q =>
+        {
+            q["courseid"] = courseId.ToString();
+            q["userid"] = userId.ToString();
+        });
+    }
+
     public string GetGroup(int groupId)
     {
         return GetUriFor(Methods.core_group_get_groups, q => q["groupids[0]"] = groupId.ToString());

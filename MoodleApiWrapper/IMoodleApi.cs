@@ -34,6 +34,7 @@ public interface IMoodleApi
     Task<ApiResponse<Course[]>> GetCourses(int options = int.MinValue, CancellationToken cancellationToken = default);
     Task<ApiResponse<GetCourseResult>> GetCourses(int? id = null, int[] ids = null, string shortname = null, string idnumber = null, int? category = null, CancellationToken cancellationToken = default);
     Task<ApiResponse<Content[]>> GetContents(int courseId, CancellationToken cancellationToken = default);
+    Task<ApiResponse<CourseCompletionStatus>> GetCourseCompletionStatus(int courseId, int userId, CancellationToken cancellationToken = default);
     Task<ApiResponse<Group>> GetGroup(int groupId, CancellationToken cancellationToken = default);
     Task<ApiResponse<Group[]>> GetGroups(int[] groupIds, CancellationToken cancellationToken = default);
     Task<ApiResponse<Group[]>> GetCourseGroups(int courseId, CancellationToken cancellationToken = default);
