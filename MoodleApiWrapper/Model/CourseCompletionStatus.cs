@@ -21,7 +21,7 @@ public class Completion
     public string title { get; set; }
     public string status { get; set; }
     public bool complete { get; set; }
-    public int timecompleted { get; set; }
+    public int? timecompleted { get; set; }
     public CompletionDetails details { get; set; }
 }
 
