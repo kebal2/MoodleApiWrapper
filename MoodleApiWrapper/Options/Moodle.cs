@@ -2,6 +2,6 @@
 
 public class Moodle
 {
-    public string Host { get; set; }
-    public string ApiToken { get; set; }
+    public string Host { get; set; } = null!;
+    public string ApiToken { get; set; } = null!;
 }

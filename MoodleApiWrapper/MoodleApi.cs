@@ -103,11 +103,13 @@ internal class MoodleApi : IMoodleApi
 
     public Task<ApiResponse<Course[]>> GetCourses(int options = int.MinValue, CancellationToken cancellationToken = default) => Get<Course[]>(mrb.GetCourses(options), cancellationToken);
 
-    public Task<ApiResponse<GetCourseResult>> GetCourses(int? id = null, int[] ids = null, string shortname = null, string idnumber = null, int? category = null, CancellationToken cancellationToken = default) =>
+    public Task<ApiResponse<GetCourseResult>> GetCourses(int? id = null, int[]? ids = null, string? shortname = null, string? idnumber = null, int? category = null, CancellationToken cancellationToken = default) =>
         Get<GetCourseResult>(mrb.GetCourses(id, ids, shortname, idnumber, category), cancellationToken);
 
     public Task<ApiResponse<Content[]>> GetContents(int courseId, CancellationToken cancellationToken = default) => Get<Content[]>(mrb.GetContents(courseId), cancellationToken);
-    public Task<ApiResponse<CourseCompletionStatus>> GetCourseCompletionStatus(int courseId, int userId, CancellationToken cancellationToken = default) => Get<CourseCompletionStatus>(mrb.GetCourseCompletionStatus(courseId, userId), cancellationToken);
+
+    public Task<ApiResponse<CourseCompletionStatus>> GetCourseCompletionStatus(int courseId, int userId, CancellationToken cancellationToken = default) =>
+        Get<CourseCompletionStatus>(mrb.GetCourseCompletionStatus(courseId, userId), cancellationToken);
 
     public Task<ApiResponse<Group>> GetGroup(int groupId, CancellationToken cancellationToken = default) => Get<Group>(mrb.GetGroup(groupId), cancellationToken);
 
@@ -118,41 +120,41 @@ internal class MoodleApi : IMoodleApi
     public Task<ApiResponse<EnrolledUser[]>> GetEnrolledUsersByCourse(int courseId, CancellationToken cancellationToken = default) => Get<EnrolledUser[]>(mrb.GetEnrolledUsersByCourse(courseId), cancellationToken);
 
     public Task<ApiResponse<NewCourse>> CreateCourse(CourseCreate course, CancellationToken cancellationToken = default) => Get<NewCourse>(mrb.CreateCourse(course), cancellationToken);
-    public Task<ApiResponse<NewCourse[]>> CreateCourses(CourseCreate[] courses, int[] categoryIds = null, CancellationToken cancellationToken = default) => Get<NewCourse[]>(mrb.CreateCourses(courses, categoryIds), cancellationToken);
+    public Task<ApiResponse<NewCourse[]>> CreateCourses(CourseCreate[] courses, int[]? categoryIds = null, CancellationToken cancellationToken = default) => Get<NewCourse[]>(mrb.CreateCourses(courses, categoryIds), cancellationToken);
 
     public Task<ApiResponse<UpdateCourseRoot>> UpdateCourse(int id, CourseUpdate course, CancellationToken cancellationToken = default) => Get<UpdateCourseRoot>(mrb.UpdateCourse(id, course), cancellationToken);
 
-    public Task<ApiResponse<Category[]>> GetGrades(int courseId, string component = "", int activityId = Int32.MaxValue, string[] userIds = null, CancellationToken cancellationToken = default) =>
+    public Task<ApiResponse<Category[]>> GetGrades(int courseId, string component = "", int activityId = Int32.MaxValue, string[]? userIds = null, CancellationToken cancellationToken = default) =>
         Get<Category[]>(mrb.GetGrades(courseId, component, activityId, userIds), cancellationToken);
 
-    public Task<ApiResponse<Events[]>> GetCalendarEvents(int[] groupIds = null, int[] courseIds = null, int[] eventIds = null, CancellationToken cancellationToken = default) =>
+    public Task<ApiResponse<Events[]>> GetCalendarEvents(int[]? groupIds = null, int[]? courseIds = null, int[]? eventIds = null, CancellationToken cancellationToken = default) =>
         Get<Events[]>(mrb.GetCalendarEvents(groupIds, courseIds, eventIds), cancellationToken);
 
-    public Task<ApiResponse<Events[]>> CreateCalendarEvents(string[] names, string[] descriptions = null,
-        int[] formats = null, int[] groupIds = null, int[] courseIds = null, int[] repeats = null,
-        string[] eventTypes = null, DateTime[] timeStarts = null, TimeSpan[] timeDurations = null,
-        int[] visible = null, int[] sequences = null, CancellationToken cancellationToken = default) =>
+    public Task<ApiResponse<Events[]>> CreateCalendarEvents(string[] names, string[]? descriptions = null,
+        int[]? formats = null, int[]? groupIds = null, int[]? courseIds = null, int[]? repeats = null,
+        string[]? eventTypes = null, DateTime[]? timeStarts = null, TimeSpan[]? timeDurations = null,
+        int[]? visible = null, int[]? sequences = null, CancellationToken cancellationToken = default) =>
         Get<Events[]>(mrb.CreateCalendarEvents(names, descriptions,
             formats, groupIds, courseIds, repeats,
             eventTypes, timeStarts, timeDurations,
             visible, sequences), cancellationToken);
 
-    public Task<ApiResponse<Events[]>> DeleteCalendarEvents(int[] eventIds, int[] repeats, string[] descriptions = null, CancellationToken cancellationToken = default) =>
+    public Task<ApiResponse<Events[]>> DeleteCalendarEvents(int[] eventIds, int[] repeats, string[]? descriptions = null, CancellationToken cancellationToken = default) =>
         Get<Events[]>(mrb.DeleteCalendarEvents(eventIds, repeats, descriptions), cancellationToken);
 
-    public async Task<Group> GetGroupByName(string groupName, int courseId, CancellationToken cancellationToken = default)
+    public async Task<Group?> GetGroupByName(string groupName, int courseId, CancellationToken cancellationToken = default)
     {
         var courseGroups = await GetCourseGroups(courseId, cancellationToken);
-        return courseGroups.SuccessfulCall && courseGroups.Data?.Length > 0
+        return courseGroups is { SuccessfulCall: true, Data.Length: > 0 }
             ? courseGroups.Data.SingleOrDefault(g => g.name == groupName)
             : null;
     }
 
-    public Task<ApiResponse<Group[]>> CreateGroups(string[] names, int[] courseIds, string[] descriptions, int[] descriptionFormats = null, string[] enrolmentKeys = null, string[] idNumbers = null, int visibility = 0,
+    public Task<ApiResponse<Group[]>> CreateGroups(string[] names, int[] courseIds, string[] descriptions, int[]? descriptionFormats = null, string[]? enrolmentKeys = null, string[]? idNumbers = null, int visibility = 0,
         CancellationToken cancellationToken = default) =>
         Get<Group[]>(mrb.CreateGroups(names, courseIds, descriptions, descriptionFormats, enrolmentKeys, idNumbers), cancellationToken);
 
-    private async Task<AuthentiactionResponse<T>> GetAuth<T>(string uri, CancellationToken cancellationToken) where T : IDataModel
+    private async Task<AuthenticationResponse<T>> GetAuth<T>(string uri, CancellationToken cancellationToken) where T : IDataModel
     {
         try
         {
@@ -207,7 +209,7 @@ internal class MoodleApi : IMoodleApi
 
         request.Content = GetPostData(getData);
 
-        HttpResponseMessage response = null;
+        HttpResponseMessage? response = null;
 
         try
         {

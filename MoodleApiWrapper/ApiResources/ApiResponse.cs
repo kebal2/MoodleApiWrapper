@@ -18,22 +18,23 @@ public class ApiResponse<T>
     /// </summary>
     public bool SuccessfulCall { get; private set; }
 
-    public T Data { get; private set; }
+    public T? Data { get; private set; }
 
     public Error Error { get; }
 
-    public string ResponseText { get; set; }
+    public string? ResponseText { get; init; }
 
-    public string RequestedPath { get; set; }
+    public string? RequestedPath { get; init; }
+
     internal ApiResponse(ApiResponseRaw rawResponse)
     {
-        Error = rawResponse.Error.ToObject<Error>();
+        Error = rawResponse.Error.ToObject<Error>() ?? new Error(null, null, null);
 
         SuccessfulCall = Error.errorcode == null && Error.exception == null && Error.message == null;
 
         if (!SuccessfulCall)
         {
-            Data = default;
+            Data = default(T);
             return;
         }
 
@@ -43,7 +44,9 @@ public class ApiResponse<T>
         }
         catch (JsonSerializationException)
         {
-            var a =rawResponse.Data.ToObject<T[]>();
+            var a = rawResponse.Data.ToObject<T[]>();
+
+            if (a == null) return;
 
             if (a.Length > 1)
                 throw new InvalidOperationException("Single entry expected, got an array");

@@ -75,7 +75,7 @@ public class MoodleRequestBuilder
             {
                 var field = fieldInfos[i];
                 q[$"criteria[{i}][key]"] = field.Name;
-                q[$"criteria[{i}][value]"] = field.GetValue(criteria).ToString();
+                q[$"criteria[{i}][value]"] = field.GetValue(criteria)?.ToString();
             }
 
             var propertyInfos = criteria.GetType().GetProperties();
@@ -83,7 +83,7 @@ public class MoodleRequestBuilder
             {
                 var field = propertyInfos[i];
                 q[$"criteria[{i}][key]"] = field.Name;
-                q[$"criteria[{i}][value]"] = field.GetValue(criteria).ToString();
+                q[$"criteria[{i}][value]"] = field.GetValue(criteria)?.ToString();
             }
         });
     }
@@ -139,10 +139,11 @@ public class MoodleRequestBuilder
         if (!string.IsNullOrEmpty(userOptionalProperties.address)) query[$"users[0][{nameof(userOptionalProperties.address)}]"] = userOptionalProperties.address;
         if (userOptionalProperties.suspended.HasValue) query[$"users[0][{nameof(userOptionalProperties.suspended)}]"] = userOptionalProperties.suspended.Value ? "1" : "0";
         if (userOptionalProperties.maildisplay.HasValue) query[$"users[0][{nameof(userOptionalProperties.maildisplay)}]"] = ((int)userOptionalProperties.maildisplay.Value).ToString();
-        query.AddField(userOptionalProperties.preferences_type, "preferences", "type");
-        query.AddField(userOptionalProperties.preferences_value, "preferences", "value");
-        query.AddField(userOptionalProperties.customfields_type, "customfields", "type");
-        query.AddField(userOptionalProperties.customfields_value, "customfields", "value");
+
+        if (userOptionalProperties.preferences_type != null) query.AddField(userOptionalProperties.preferences_type, "preferences", "type");
+        if (userOptionalProperties.preferences_value != null) query.AddField(userOptionalProperties.preferences_value, "preferences", "value");
+        if (userOptionalProperties.customfields_type != null) query.AddField(userOptionalProperties.customfields_type, "customfields", "type");
+        if (userOptionalProperties.customfields_value != null) query.AddField(userOptionalProperties.customfields_value, "customfields", "value");
     }
 
 
@@ -282,7 +283,7 @@ public class MoodleRequestBuilder
     /// <param name="idnumber">course id number</param>
     /// <param name="category">category id the course belongs to</param>
     /// <returns></returns>
-    public string GetCourses(int? id, int[] ids, string shortname, string idnumber, int? category)
+    public string GetCourses(int? id, int[]? ids, string? shortname, string? idnumber, int? category)
     {
         return GetUriFor(Methods.core_course_get_courses_by_field, q =>
         {
@@ -388,7 +389,7 @@ public class MoodleRequestBuilder
         });
     }
 
-    public string CreateCourses(CourseCreate[] courses, int[] categoryIds = default)
+    public string CreateCourses(CourseCreate[] courses, int[]? categoryIds = null)
     {
         return GetUriFor(Methods.core_course_create_courses, q =>
         {
@@ -416,7 +417,7 @@ public class MoodleRequestBuilder
         });
     }
 
-    public string GetGrades(int courseId, string component = "", int activityId = int.MaxValue, string[] userIds = null)
+    public string GetGrades(int courseId, string component = "", int activityId = int.MaxValue, string[]? userIds = null)
     {
         return GetUriFor(Methods.core_grades_get_grades, q =>
         {
@@ -427,7 +428,7 @@ public class MoodleRequestBuilder
         });
     }
 
-    public string GetCalendarEvents(int[] groupIds = default, int[] courseIds = default, int[] eventids = default)
+    public string GetCalendarEvents(int[]? groupIds = null, int[]? courseIds = null, int[]? eventids = null)
     {
         return GetUriFor(Methods.core_calendar_get_calendar_events, q =>
         {
@@ -436,19 +437,19 @@ public class MoodleRequestBuilder
                     q[$"events[groupids][{i}]"] = groupIds[i].ToString();
 
             if (courseIds != null)
-                for (var i = 0; i < courseIds.Length; i++)
-                    q["events[courseids][{i}]"] = courseIds[i].ToString();
+                foreach (var courseId in courseIds)
+                    q["events[courseids][{i}]"] = courseId.ToString();
 
             if (eventids != null)
-                for (var i = 0; i < eventids.Length; i++)
-                    q["events[eventids][{i}]"] = eventids[i].ToString();
+                foreach (var ecentId in eventids)
+                    q["events[eventids][{i}]"] = ecentId.ToString();
         });
     }
 
-    public string CreateCalendarEvents(string[] names, string[] descriptions = default,
-        int[] formats = default, int[] groupIds = default, int[] courseIds = default, int[] repeats = default,
-        string[] eventTypes = default, DateTime[] timeStarts = default, TimeSpan[] timeDurations = default,
-        int[] visible = default, int[] sequences = default)
+    public string CreateCalendarEvents(string[] names, string[]? descriptions = null,
+        int[]? formats = null, int[]? groupIds = null, int[]? courseIds = null, int[]? repeats = null,
+        string[]? eventTypes = null, DateTime[]? timeStarts = null, TimeSpan[]? timeDurations = null,
+        int[]? visible = null, int[]? sequences = null)
     {
         return GetUriFor(Methods.core_calendar_create_calendar_events, q =>
         {
@@ -493,17 +494,15 @@ public class MoodleRequestBuilder
         });
     }
 
-    public string DeleteCalendarEvents(int[] eventids, int[] repeats, string[] descriptions = default)
+    public string DeleteCalendarEvents(int[] eventids, int[] repeats, string[]? descriptions = null)
     {
         return GetUriFor(Methods.core_calendar_delete_calendar_events, q =>
         {
-            if (repeats != null)
-                for (var i = 0; i < repeats.Length; i++)
-                    q[$"events[{i}][repeat]"] = repeats[i].ToString();
+            for (var i = 0; i < repeats.Length; i++)
+                q[$"events[{i}][repeat]"] = repeats[i].ToString();
 
-            if (eventids != null)
-                for (var i = 0; i < eventids.Length; i++)
-                    q[$"events[{i}][eventid]"] = eventids[i].ToString();
+            for (var i = 0; i < eventids.Length; i++)
+                q[$"events[{i}][eventid]"] = eventids[i].ToString();
 
             if (descriptions != null)
                 for (var i = 0; i < descriptions.Length; i++)
@@ -511,22 +510,19 @@ public class MoodleRequestBuilder
         });
     }
 
-    public string CreateGroups(string[] names = default, int[] courseIds = default, string[] descriptions = default,
-        int[] descriptionFormats = default, string[] enrolmentKeys = default, string[] idNumbers = default)
+    public string CreateGroups(string[] names, int[] courseIds, string[] descriptions,
+        int[]? descriptionFormats = null, string[]? enrolmentKeys = null, string[]? idNumbers = null)
     {
         return GetUriFor(Methods.core_group_create_groups, q =>
         {
-            if (names != null)
-                for (var i = 0; i < names.Length; i++)
-                    q[$"groups[{i}][name]"] = names[i];
+            for (var i = 0; i < names.Length; i++)
+                q[$"groups[{i}][name]"] = names[i];
 
-            if (courseIds != null)
-                for (var i = 0; i < courseIds.Length; i++)
-                    q[$"groups[{i}][courseid]"] = courseIds[i].ToString();
+            for (var i = 0; i < courseIds.Length; i++)
+                q[$"groups[{i}][courseid]"] = courseIds[i].ToString();
 
-            if (descriptions != null)
-                for (var i = 0; i < descriptions.Length; i++)
-                    q[$"groups[{i}][description]"] = descriptions[i];
+            for (var i = 0; i < descriptions.Length; i++)
+                q[$"groups[{i}][description]"] = descriptions[i];
 
             if (descriptionFormats != null)
                 for (var i = 0; i < descriptionFormats.Length; i++)
