@@ -10,7 +10,7 @@ namespace MoodleApiWrapper;
 public interface IMoodleApi
 {
     Task<ApiResponse<Success>> DeleteCourses(int[] courseIds, CancellationToken cancellationToken = default);
-    Task<AuthentiactionResponse<AuthToken>> GetApiToken(string username, string password, string serviceHostName, CancellationToken cancellationToken = default);
+    Task<AuthenticationResponse<AuthToken>> GetApiToken(string username, string password, string serviceHostName, CancellationToken cancellationToken = default);
     Task<ApiResponse<SiteInfo>> GetSiteInfo(string serviceHostName = "", CancellationToken cancellationToken = default);
     Task<ApiResponse<Users>> GetUsers(object criteria, CancellationToken cancellationToken = default);
     Task<ApiResponse<User[]>> GetUsers(UserFields field, string[] values, CancellationToken cancellationToken = default);

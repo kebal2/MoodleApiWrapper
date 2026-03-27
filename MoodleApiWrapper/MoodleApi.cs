@@ -40,7 +40,7 @@ internal class MoodleApi : IMoodleApi
 
     public Task<ApiResponse<Success>> DeleteCourses(int[] courseIds, CancellationToken cancellationToken = default) => Get<Success>(mrb.DeleteCourses(courseIds), cancellationToken);
 
-    public Task<AuthentiactionResponse<AuthToken>> GetApiToken(string username, string password, string serviceHostName, CancellationToken cancellationToken = default)
+    public Task<AuthenticationResponse<AuthToken>> GetApiToken(string username, string password, string serviceHostName, CancellationToken cancellationToken = default)
     {
         string query =
             "login/token.php" +
@@ -162,7 +162,7 @@ internal class MoodleApi : IMoodleApi
 
             var data = JObject.Parse(responseStream);
 
-            return new AuthentiactionResponse<T>(new AuthentiactionResponseRaw(data));
+            return new AuthenticationResponse<T>(new AuthentiactionResponseRaw(data));
         }
         catch (WebException)
         {
