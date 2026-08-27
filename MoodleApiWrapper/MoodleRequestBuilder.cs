@@ -538,6 +538,34 @@ public class MoodleRequestBuilder
         });
     }
 
+    public string UpdateGroups(int[] groupIds, string[] names, string[] descriptions,
+        int[]? descriptionFormats = null, string[]? enrolmentKeys = null, string[]? idNumbers = null)
+    {
+        return GetUriFor(Methods.core_group_update_groups, q =>
+        {
+            for (var i = 0; i < groupIds.Length; i++)
+                q[$"groups[{i}][id]"] = groupIds[i].ToString();
+
+            for (var i = 0; i < names.Length; i++)
+                q[$"groups[{i}][name]"] = names[i];
+
+            for (var i = 0; i < descriptions.Length; i++)
+                q[$"groups[{i}][description]"] = descriptions[i];
+
+            if (descriptionFormats != null)
+                for (var i = 0; i < descriptionFormats.Length; i++)
+                    q[$"groups[{i}][descriptionformat]"] = descriptionFormats[i].ToString();
+
+            if (enrolmentKeys != null)
+                for (var i = 0; i < enrolmentKeys.Length; i++)
+                    q[$"groups[{i}][enrolmentkey]"] = enrolmentKeys[i];
+
+            if (idNumbers != null)
+                for (var i = 0; i < idNumbers.Length; i++)
+                    q[$"groups[{i}][idnumber]"] = idNumbers[i];
+        });
+    }
+
     internal string GetUriFor(Methods method, Action<NameValueCollection> queryCallback, Format format = Format.json)
     {
         var uriBuilder = new UriBuilder(host.TrimEnd('/'));

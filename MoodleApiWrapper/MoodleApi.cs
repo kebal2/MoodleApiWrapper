@@ -154,6 +154,10 @@ internal class MoodleApi : IMoodleApi
         CancellationToken cancellationToken = default) =>
         Get<Group[]>(mrb.CreateGroups(names, courseIds, descriptions, descriptionFormats, enrolmentKeys, idNumbers), cancellationToken);
 
+    public Task<ApiResponse<Success>> UpdateGroups(int[] groupIds, string[] names, string[] descriptions, int[]? descriptionFormats = null, string[]? enrolmentKeys = null, string[]? idNumbers = null,
+        CancellationToken cancellationToken = default) =>
+        Get<Success>(mrb.UpdateGroups(groupIds, names, descriptions, descriptionFormats, enrolmentKeys, idNumbers), cancellationToken);
+
     private async Task<AuthenticationResponse<T>> GetAuth<T>(string uri, CancellationToken cancellationToken) where T : IDataModel
     {
         try

@@ -56,5 +56,8 @@ public interface IMoodleApi
     Task<ApiResponse<Group[]>> CreateGroups(string[] names, int[] courseIds, string[] descriptions, int[]? descriptionFormats = null, string[]? enrolmentKeys = null, string[]? idNumbers = null, int visibility = 0,
         CancellationToken cancellationToken = default);
 
+    Task<ApiResponse<Success>> UpdateGroups(int[] groupIds, string[] names, string[] descriptions, int[]? descriptionFormats = null, string[]? enrolmentKeys = null, string[]? idNumbers = null,
+        CancellationToken cancellationToken = default);
+
     Task<Group?> GetGroupByName(string groupName, int courseId, CancellationToken cancellationToken = default);
 }
