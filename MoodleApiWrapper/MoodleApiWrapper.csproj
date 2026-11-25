@@ -10,4 +10,11 @@
     <PackageReference Include="Microsoft.Extensions.Options" Version="10.0.15" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
   </ItemGroup>
+
+  <ItemGroup>
+    <!-- The console sample app lives in this repo's MoodleApi.sln as "Console\Console.csproj"
+         but on disk as "console/console.csproj", so cover both assembly names. -->
+    <InternalsVisibleTo Include="Console" />
+    <InternalsVisibleTo Include="console" />
+  </ItemGroup>
 </Project>

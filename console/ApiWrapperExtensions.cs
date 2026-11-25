@@ -1,10 +1,11 @@
 ﻿using MoodleApiWrapper;
+using MoodleApiWrapper.Model;
 
 using Newtonsoft.Json;
 
 namespace Console
 {
-    public static class CourseGenerator
+    internal static class CourseGenerator
     {
         public static async Task CreateCourses(this MoodleApi moodleMoodleApi, int courseCount, int batchSize = 5)
         {
@@ -29,9 +30,9 @@ namespace Console
 
         public static async Task DeleteCourses(this MoodleApi moodleMoodleApi, int batchSize = 15)
         {
-            var getCourses = await moodleMoodleApi.GetCourses();
+            var getCourses = await moodleMoodleApi.GetCourses(int.MinValue);
 
-            var courseIds = getCourses.DataArray.Select(c => c.id).ToArray();
+            var courseIds = (getCourses.Data ?? Array.Empty<Course>()).Select(c => c.id).ToArray();
 
             for (int i = 0; i < courseIds.Length; i += batchSize)
             {
